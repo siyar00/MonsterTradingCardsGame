@@ -1,8 +1,11 @@
 package at.technikum.application.controller.game;
 
+import at.technikum.application.config.DataSource;
+import at.technikum.application.repository.UsersRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
+import at.technikum.application.service.GameService;
 import at.technikum.application.util.Pair;
 import at.technikum.http.RequestContext;
 import at.technikum.http.Response;
@@ -11,6 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameController implements Controller {
+
+    private GameService gameService;
+
+    public GameController(DataSource dataSource) {
+        //this.gameService = new GameService(new GameRepository(dataSource));
+    }
 
     private Response readStats(RequestContext requestContext) {
         return null;

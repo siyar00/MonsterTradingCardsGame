@@ -8,28 +8,15 @@ import java.sql.SQLException;
 
 public class DataSource implements DbConnector {
 
-    private static HikariConfig config;
     private static HikariDataSource ds;
-
-    static {
-        config.setJdbcUrl( "jdbc_url" );
-        config.setUsername( "database_username" );
-        config.setPassword( "database_password" );
-        config.addDataSourceProperty( "cachePrepStmts" , "true" );
-        config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
-        config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
-        ds = new HikariDataSource( config );
-    }
-    private DataSource() {
-        config = new HikariConfig("src/main/resources/hikari.properties");
-        ds = new HikariDataSource(config);
-    }
     private static DataSource dataSource;
 
+    private DataSource() {
+        ds = new HikariDataSource(new HikariConfig("src/main/resources/hikari.properties"));
+    }
+
     public static DataSource getInstance() {
-        if (dataSource == null) {
-            dataSource = new DataSource();
-        }
+        if (dataSource == null) dataSource = new DataSource();
         return dataSource;
     }
 

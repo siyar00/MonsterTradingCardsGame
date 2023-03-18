@@ -3,11 +3,12 @@ package at.technikum.http;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
 import at.technikum.application.router.Router;
+import at.technikum.http.exceptions.BadRequestException;
+import at.technikum.http.exceptions.Except;
+import at.technikum.http.exceptions.UnauthorizedException;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RequestHandler implements Runnable {
 
@@ -26,16 +27,17 @@ public class RequestHandler implements Runnable {
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final RequestContext requestContext = new RequestContext().parseRequest(bufferedReader);
+            //Can delete it afterwards
             System.out.println("Thread: " + Thread.currentThread().getName());
-            requestContext.print();
+            System.out.println(requestContext);
 
             final Route route = router.findRoute(new RouteIdentifier(requestContext.getPath(), requestContext.getHttpVerb()));
             Response response = new Response();
             try {
                 response = route.process(requestContext);
-            } catch (BadRequestException e) {
+            } catch (Except e) {
                 response.setBody(e.getMessage());
-                response.setHttpStatus(HttpStatus.BAD_REQUEST);
+                response.setHttpStatus(e.getHttpStatus());
             } catch (IllegalStateException e) {
                 response.setBody(e.getMessage());
                 response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);

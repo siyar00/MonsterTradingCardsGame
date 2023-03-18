@@ -15,14 +15,6 @@ public class RouteIdentifier {
         return new RouteIdentifier(path, httpVerb);
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public String getHttpVerb() {
-        return httpVerb;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

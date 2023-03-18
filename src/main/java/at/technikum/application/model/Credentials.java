@@ -1,7 +1,12 @@
 package at.technikum.application.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Credentials {
 
     @JsonProperty("Username")
@@ -9,18 +14,4 @@ public class Credentials {
     @JsonProperty("Password")
     private String password;
 
-    public Credentials() {}
-
-    public Credentials(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

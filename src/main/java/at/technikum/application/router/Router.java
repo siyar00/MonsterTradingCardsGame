@@ -1,5 +1,6 @@
 package at.technikum.application.router;
 
+import at.technikum.application.config.DataSource;
 import at.technikum.application.controller.cards.CardController;
 import at.technikum.application.controller.game.GameController;
 import at.technikum.application.controller.packages.PackageController;
@@ -13,13 +14,14 @@ import java.util.Map;
 public class Router {
 
     private final Map<RouteIdentifier, Route> routes = new HashMap<>();
+    private final static DataSource ds = DataSource.getInstance();
 
     public Router(){
-        new UserController(null).listRoutes().forEach(this::registerRoute);
-        new CardController().listRoutes().forEach(this::registerRoute);
-        new GameController().listRoutes().forEach(this::registerRoute);
-        new PackageController().listRoutes().forEach(this::registerRoute);
-        new TradingController().listRoutes().forEach(this::registerRoute);
+        new UserController(ds).listRoutes().forEach(this::registerRoute);
+        new CardController(ds).listRoutes().forEach(this::registerRoute);
+        new GameController(ds).listRoutes().forEach(this::registerRoute);
+        new PackageController(ds).listRoutes().forEach(this::registerRoute);
+        new TradingController(ds).listRoutes().forEach(this::registerRoute);
     }
 
     public void registerRoute(Pair<RouteIdentifier, Route> routeIdentifierRoutePair) {

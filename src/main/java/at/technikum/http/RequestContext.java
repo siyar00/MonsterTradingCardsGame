@@ -1,86 +1,61 @@
 package at.technikum.http;
 
+import at.technikum.http.exceptions.BadRequestException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
+@Data
+@NoArgsConstructor
 public class RequestContext {
 
     private static final String CONTENT_LENGTH_HEADER_NAME = "Content-Length";
     private String httpVerb;
     private String path;
-    private List<Header> headers;
+    private String pathVariable;
     private String body;
+    private Map<String, String> headers = new HashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public RequestContext parseRequest(BufferedReader bufferedReader) throws IOException {
         RequestContext requestContext = new RequestContext();
-        String versionString = bufferedReader.readLine();
-        final String[] splitVersionString = versionString.split(" ");
+
+        String[] splitVersionString = bufferedReader.readLine().split(" ");
         requestContext.setHttpVerb(splitVersionString[0]);
         requestContext.setPath(splitVersionString[1]);
 
-        List<Header> headerList = new ArrayList<>();
-        HeaderParser headerParser = new HeaderParser();
         String input;
-        while (true) {
-            input = bufferedReader.readLine();
-            if (input.equals("")) break;
-            headerList.add(headerParser.parseHeader(input));
+        while (!(input = bufferedReader.readLine()).equals("")) {
+            String[] header = input.split(":", 2);
+            headers.put(header[0], header[1].trim());
         }
-        requestContext.setHeaders(headerList);
-
-        int contentLength = requestContext.getContentLength();
-        char[] buffer = new char[contentLength];
-        bufferedReader.read(buffer, 0, contentLength);
-        requestContext.setBody(new String(buffer));
+        requestContext.setHeaders(headers);
+        if (requestContext.getHeaders().containsKey(CONTENT_LENGTH_HEADER_NAME)) {
+            int contentLength = Integer.parseInt(requestContext.getHeaders().get(CONTENT_LENGTH_HEADER_NAME));
+            char[] buffer = new char[contentLength];
+            bufferedReader.read(buffer, 0, contentLength);
+            requestContext.setBody(new String(buffer));
+        }
         return requestContext;
     }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public String getHttpVerb() {
-        return httpVerb;
-    }
-
-    public void setHttpVerb(String httpVerb) {
-        this.httpVerb = httpVerb;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
     public void setPath(String path) {
-        this.path = path;
-    }
-
-    public List<Header> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(List<Header> headers) {
-        this.headers = headers;
-    }
-
-    public int getContentLength() {
-        return headers.stream()
-                .filter(header -> CONTENT_LENGTH_HEADER_NAME.equals(header.getName()))
-                .findFirst()
-                .map(Header::getValue)
-                .map(Integer::parseInt)
-                .orElse(0);
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
+        if (path.contains("users/")) {
+            this.pathVariable = path.substring(path.lastIndexOf("/") + 1);
+            this.path = path.substring(0, path.lastIndexOf("/") + 1);
+        } else if (path.contains("tradings/")) {
+            this.pathVariable = path.substring(path.lastIndexOf("/") + 1);
+            this.path = path.substring(0, path.lastIndexOf("/") + 1);
+        } else {
+            this.path = path;
+            pathVariable = null;
+        }
     }
 
     public <T> T getBodyAs(Class<T> clazz) {
@@ -92,10 +67,11 @@ public class RequestContext {
         }
     }
 
-    public void print() {
-        System.out.println("HTTP-Verb: " + httpVerb);
-        System.out.println("Path " + path);
-        System.out.println("Headers: " + headers);
-        System.out.println("Body: " + body);
+    @Override
+    public String toString() {
+        return "HTTP-Verb: " + httpVerb + "\n" +
+                "Path: " + path + "\n" +
+                "Headers: " + headers + "\n" +
+                "Body: " + body + "\n";
     }
 }
