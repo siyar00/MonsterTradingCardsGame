@@ -1,4 +1,4 @@
 .gitignore
 MonsterTradingCards.exercise.curl.bat
-target
-.idea
+/target
+/.idea
