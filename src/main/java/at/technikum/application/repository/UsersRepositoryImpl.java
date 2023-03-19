@@ -21,7 +21,11 @@ public class UsersRepositoryImpl implements UsersRepository {
                 CREATE TABLE IF NOT EXISTS users(
                     user_id SERIAL PRIMARY KEY,
                     username TEXT NOT NULL,
-                    password TEXT NOT NULL
+                    password TEXT NOT NULL,
+                    coins INTEGER DEFAULT 20 CHECK (coins >= 0),
+                    name TEXT,
+                    bio TEXT,
+                    image TEXT
                 );
             """;
 
@@ -121,8 +125,8 @@ public class UsersRepositoryImpl implements UsersRepository {
                 stmt.setString(1, credentials.getUsername());
                 stmt.setString(2, credentials.getPassword());
                 ResultSet rs = stmt.executeQuery();
-                if(!rs.next()) throw new UnauthorizedException("Invalid username/password provided");
-                return credentials.getUsername()+"-mtcgToken";
+                if (!rs.next()) throw new UnauthorizedException("Invalid username/password provided");
+                return credentials.getUsername() + "-mtcgToken";
             } finally {
                 connection.close();
             }

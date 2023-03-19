@@ -3,12 +3,14 @@ package at.technikum.http;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
 import at.technikum.application.router.Router;
+import at.technikum.application.util.Headers;
 import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.Except;
 import at.technikum.http.exceptions.UnauthorizedException;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collections;
 
 public class RequestHandler implements Runnable {
 
@@ -38,6 +40,7 @@ public class RequestHandler implements Runnable {
             } catch (Except e) {
                 response.setBody(e.getMessage());
                 response.setHttpStatus(e.getHttpStatus());
+                response.setHeaders(Collections.singletonList(Headers.CONTENT_TYPE_TEXT));
             } catch (IllegalStateException e) {
                 response.setBody(e.getMessage());
                 response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);

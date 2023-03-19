@@ -13,7 +13,7 @@ import java.util.List;
 public class Response {
     private HttpStatus httpStatus;
     private String body;
-    private List<String> headers;
+    private List<Headers> headers;
 
     public Response(){
         this.httpStatus = HttpStatus.BAD_REQUEST;
@@ -27,7 +27,7 @@ public class Response {
         this.headers = new ArrayList<>();
     }
 
-    public Response(HttpStatus status, String body, String header){
+    public Response(HttpStatus status, String body, Headers header){
         this.httpStatus = status;
         this.body = body;
         this.headers = Collections.singletonList(header);
@@ -36,8 +36,8 @@ public class Response {
     @Override
     public String toString(){
         StringBuilder response = new StringBuilder("HTTP/1.1 " + httpStatus.getStatusCode() + " " + httpStatus.getStatusMessage() + "\n");
-        for (String header : this.headers){
-            response.append(header).append("\n");
+        for (Headers header : this.headers){
+            response.append(header.toString()).append("\n");
         }
         return response + "\n"+ body;
     }

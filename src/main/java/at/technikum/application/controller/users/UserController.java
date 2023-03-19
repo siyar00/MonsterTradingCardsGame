@@ -35,25 +35,25 @@ public class UserController implements Controller {
     private Response registerUser(RequestContext requestContext) {
         if(requestContext.getBody().equals("")) throw new BadRequestException("No Body!");
         Credentials credentials = requestContext.getBodyAs(Credentials.class);
-        return new Response(HttpStatus.CREATED, usersService.registerUser(credentials), Headers.CONTENT_TYPE_TEXT.toString());
+        return new Response(HttpStatus.CREATED, usersService.registerUser(credentials), Headers.CONTENT_TYPE_TEXT);
     }
 
     private Response readUser(RequestContext requestContext) {
         isAuthorized(requestContext);
-        return new Response(HttpStatus.OK, usersService.readUserData(requestContext.getPathVariable()), Headers.CONTENT_TYPE_JSON.toString());
+        return new Response(HttpStatus.OK, usersService.readUserData(requestContext.getPathVariable()), Headers.CONTENT_TYPE_JSON);
     }
 
     private Response updateUser(RequestContext requestContext) {
         if(requestContext.getBody().equals("")) throw new BadRequestException("No Body!");
         isAuthorized(requestContext);
         UserDataRec userData = requestContext.getBodyAs(UserDataRec.class);
-        return new Response(HttpStatus.OK, usersService.updateUser(requestContext.getPathVariable(), userData), Headers.CONTENT_TYPE_TEXT.toString());
+        return new Response(HttpStatus.OK, usersService.updateUser(requestContext.getPathVariable(), userData), Headers.CONTENT_TYPE_TEXT);
     }
 
-    public Response loginUser(RequestContext requestContext) {
+    private Response loginUser(RequestContext requestContext) {
         if(requestContext.getBody().equals("")) throw new BadRequestException("No Body!");
         Credentials credentials = requestContext.getBodyAs(Credentials.class);
-        return new Response(HttpStatus.OK, usersService.loginUser(credentials), Headers.CONTENT_TYPE_JSON.toString());
+        return new Response(HttpStatus.OK, usersService.loginUser(credentials), Headers.CONTENT_TYPE_JSON);
     }
 
     private void isAuthorized(RequestContext requestContext){
