@@ -1,12 +1,17 @@
 package at.technikum.application.service;
 
-import at.technikum.application.repository.UsersRepository;
+import at.technikum.application.repository.GameRepository;
 
-public class GameService {
+public record GameService(GameRepository gameRepository) {
+    public String readStats() {
+        return gameRepository.readStats();
+    }
 
-    private final UsersRepository usersRepository;
+    public String readScoreboard() {
+        return gameRepository.readScoreboard();
+    }
 
-    public GameService(UsersRepository usersRepository) {
-        this.usersRepository = usersRepository;
+    public String startBattle() {
+        return gameRepository.startBattle();
     }
 }

@@ -1,11 +1,11 @@
 package at.technikum.application.router;
 
 import at.technikum.application.config.DataSource;
-import at.technikum.application.controller.cards.CardController;
-import at.technikum.application.controller.game.GameController;
-import at.technikum.application.controller.packages.PackageController;
-import at.technikum.application.controller.trading.TradingController;
-import at.technikum.application.controller.users.UserController;
+import at.technikum.application.controller.CardController;
+import at.technikum.application.controller.GameController;
+import at.technikum.application.controller.PackageController;
+import at.technikum.application.controller.TradingController;
+import at.technikum.application.controller.UserController;
 import at.technikum.application.util.Pair;
 
 import java.util.HashMap;

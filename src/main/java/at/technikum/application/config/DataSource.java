@@ -24,7 +24,7 @@ public class DataSource implements DbConnector {
         try {
             return ds.getConnection();
         } catch (SQLException e) {
-            throw new IllegalStateException("Database not available!", e);
+            throw new IllegalStateException("Database not available! " + e);
         }
     }
 

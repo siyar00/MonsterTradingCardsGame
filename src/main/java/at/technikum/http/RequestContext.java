@@ -21,6 +21,7 @@ public class RequestContext {
     private String path;
     private String pathVariable;
     private String body;
+    private String format;
     private Map<String, String> headers = new HashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,6 +48,10 @@ public class RequestContext {
     }
 
     public void setPath(String path) {
+        if (path.contains("?")) {
+            this.format = path.substring(path.lastIndexOf("format=") + "format=".length());
+            path = path.substring(0, path.indexOf("?"));
+        }
         if (path.contains("users/")) {
             this.pathVariable = path.substring(path.lastIndexOf("/") + 1);
             this.path = path.substring(0, path.lastIndexOf("/") + 1);

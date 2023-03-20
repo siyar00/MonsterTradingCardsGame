@@ -24,7 +24,7 @@ public class Response {
     public Response(HttpStatus status, String body){
         this.httpStatus = status;
         this.body = body;
-        this.headers = new ArrayList<>();
+        this.headers = Collections.singletonList(Headers.CONTENT_TYPE_TEXT);
     }
 
     public Response(HttpStatus status, String body, Headers header){
@@ -39,6 +39,6 @@ public class Response {
         for (Headers header : this.headers){
             response.append(header.toString()).append("\n");
         }
-        return response + "\n"+ body;
+        return response + "\n\n"+ body;
     }
 }

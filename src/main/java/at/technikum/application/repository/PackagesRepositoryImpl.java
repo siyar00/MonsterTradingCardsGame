@@ -2,9 +2,11 @@ package at.technikum.application.repository;
 
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.Card;
+import at.technikum.application.util.Authorization;
 import at.technikum.http.exceptions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,41 +25,33 @@ public class PackagesRepositoryImpl implements PackagesRepository {
                 	card3 TEXT NOT NULL,
                 	card4 TEXT NOT NULL,
                 	card5 TEXT NOT NULL,
-                	soldTo INTEGER REFERENCES users(id) ON DELETE SET NULL
-                );
-                CREATE TABLE IF NOT EXISTS cards (
-                    card_id TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    damage NUMERIC NOT NULL CHECK (damage >= 0),
-                    package_id INTEGER REFERENCES packages(package_id) ON DELETE CASCADE
-                );
+                	sold BOOLEAN DEFAULT FALSE NOT NULL
+                )
             """;
 
     private static final String INSERT_PACKAGES = """
                     INSERT INTO packages (card1, card2, card3, card4, card5) VALUES (?,?,?,?,?)
             """;
     private static final String UPDATE_PACKAGES = """
-                UPDATE packages SET sold_to = ? WHERE package_id =
-                (SELECT package_id FROM packages WHERE sold_to IS NULL ORDER BY RANDOM() LIMIT 1)
+                UPDATE packages SET sold = true WHERE package_id =
+                (SELECT package_id FROM packages WHERE sold = false ORDER BY RANDOM() LIMIT 1)
                 RETURNING *
             """;
 
-    private final DbConnector dataSource;
-    private int packageId;
-    private int userId;
+    private final DbConnector connector;
 
-    public PackagesRepositoryImpl(DbConnector dataSource) {
-        this.dataSource = dataSource;
-        try (PreparedStatement ps = dataSource.getConnection().prepareStatement(SETUP_TABLE)) {
+    public PackagesRepositoryImpl(@NotNull DbConnector connector) {
+        this.connector = connector;
+        try (PreparedStatement ps = connector.getConnection().prepareStatement(SETUP_TABLE)) {
             ps.execute();
         } catch (SQLException e) {
-            throw new IllegalStateException("Failed to setup up table", e);
+            throw new IllegalStateException("Failed to setup up table: " + e);
         }
     }
 
     @Override
     public String createPackages(List<Card> cardList) {
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
                 existingCards(connection, cardList);
@@ -67,7 +61,7 @@ public class PackagesRepositoryImpl implements PackagesRepository {
                 connection.close();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException("DB query failed", e);
+            throw new IllegalStateException("DB query failed: " + e);
         } catch (NumberFormatException e) {
             throw new BadRequestException("Damage should be a number!");
         }
@@ -91,17 +85,11 @@ public class PackagesRepositoryImpl implements PackagesRepository {
             updatePackagesStmt.setString(i + 1, cardList.get(i).getId());
         updatePackagesStmt.executeUpdate();
         updatePackagesStmt.close();
-
-        PreparedStatement selectPackageIdStmt = connection.prepareStatement("SELECT package_id FROM packages ORDER BY package_id DESC LIMIT 1");
-        ResultSet rs = selectPackageIdStmt.executeQuery();
-        if (!rs.next()) throw new NotFoundException("DB could not found package!");
-        packageId = rs.getInt("package_id");
-        selectPackageIdStmt.close();
     }
 
     private String updateCardsDB(Connection connection, List<Card> cardList) throws SQLException {
-        StringBuilder stmt = new StringBuilder("INSERT INTO cards (card_id, name, damage, package_id) VALUES ");
-        for (Card ignored : cardList) stmt.append("(?,?,?,?), ");
+        StringBuilder stmt = new StringBuilder("INSERT INTO cards (card_id, name, damage, card_type, element_type, package_id_fk) VALUES ");
+        for (Card ignored : cardList) stmt.append("(?,?,?,?,?,(SELECT package_id FROM packages ORDER BY package_id DESC LIMIT 1)), ");
         String insertStmt = stmt.substring(0, stmt.toString().lastIndexOf(","));
         PreparedStatement updateCardsStmt = connection.prepareStatement(insertStmt);
         int count = 0;
@@ -109,53 +97,61 @@ public class PackagesRepositoryImpl implements PackagesRepository {
             updateCardsStmt.setString(++count, card.getId());
             updateCardsStmt.setString(++count, card.getName());
             updateCardsStmt.setDouble(++count, card.getDamage());
-            updateCardsStmt.setInt(++count, packageId);
+            updateCardsStmt.setString(++count, card.getName().contains("Spell") ? "spell" : "monster");
+            updateCardsStmt.setString(++count, cardType(card.getName()));
         }
         updateCardsStmt.executeUpdate();
         updateCardsStmt.close();
         return "Package and cards successfully created";
     }
 
+    private String cardType(String name) {
+        if(name.contains("Water"))
+            return "water";
+        else if(name.contains("Fire"))
+            return "fire";
+        else if(name.contains("Regular"))
+            return "normal";
+        else
+            return "normal";
+    }
+
     @Override
     public String acquirePackages(String username) {
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                existingUser(connection, username);
-                String result = sellPackage(connection);
-                updatingUser(connection);
+                int userId = existingUser(username, connection);
+                String result = sellPackage(connection, userId);
+                updatingUser(connection, userId);
                 return result;
             } finally {
                 connection.close();
             }
         } catch (SQLException e) {
-            throw new IllegalStateException("DB query failed", e);
+            throw new IllegalStateException("DB query failed: " + e);
         } catch (JsonProcessingException e) {
-            throw new BadRequestException("");
+            throw new BadRequestException(e.getMessage());
         }
     }
 
-    private void existingUser(Connection connection, String username) throws SQLException {
-        PreparedStatement selectUser = connection.prepareStatement("SELECT coins, id FROM users WHERE username = ?");
-        selectUser.setString(1, username);
-        ResultSet rs = selectUser.executeQuery();
-        if (!rs.next()) throw new UnauthorizedException("Access token is missing or invalid");
+    private int existingUser(String username, Connection connection) throws SQLException {
+        ResultSet rs = new Authorization().authorizeUser(username, connection);
         if (rs.getInt("coins") < 5) throw new ForbiddenException("Not enough money for buying a card package");
-        userId = rs.getInt("id");
-        selectUser.close();
+        return rs.getInt("user_id");
     }
 
-    private String sellPackage(Connection connection) throws SQLException, JsonProcessingException {
+    private String sellPackage(Connection connection, int userId) throws SQLException, JsonProcessingException {
         PreparedStatement updatePackageStmt = connection.prepareStatement(UPDATE_PACKAGES);
-        updatePackageStmt.setInt(1, userId);
         ResultSet rs = updatePackageStmt.executeQuery();
         if (!rs.next()) throw new NotFoundException("No card package available for buying");
         int package_id = rs.getInt("package_id");
         updatePackageStmt.close();
 
-        PreparedStatement selectPackageStmt = connection.prepareStatement("SELECT * FROM cards WHERE package_id = ?");
-        selectPackageStmt.setInt(1, package_id);
-        ResultSet set = selectPackageStmt.executeQuery();
+        PreparedStatement updateCards = connection.prepareStatement("UPDATE cards SET user_id_fk = ? WHERE package_id_fk = ? RETURNING *");
+        updateCards.setInt(1, userId);
+        updateCards.setInt(2, package_id);
+        ResultSet set = updateCards.executeQuery();
         List<Card> cardList = new ArrayList<>();
         while(set.next()){
             cardList.add(Card.builder()
@@ -163,14 +159,13 @@ public class PackagesRepositoryImpl implements PackagesRepository {
                     .name(set.getString("name"))
                     .damage(set.getDouble("damage")).build());
         }
-        selectPackageStmt.close();
+        updateCards.close();
         return new ObjectMapper().writeValueAsString(cardList);
     }
 
-    private void updatingUser(Connection connection) throws SQLException {
-        PreparedStatement updateUser = connection.prepareStatement("UPDATE users SET coins = (SELECT coins FROM USERS WHERE id = ?) - 5 WHERE id = ?");
+    private void updatingUser(Connection connection, int userId) throws SQLException {
+        PreparedStatement updateUser = connection.prepareStatement("UPDATE users SET coins = coins - 5 WHERE user_id = ?");
         updateUser.setInt(1, userId);
-        updateUser.setInt(2, userId);
         updateUser.executeUpdate();
         updateUser.close();
     }
