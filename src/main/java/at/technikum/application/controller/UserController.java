@@ -2,7 +2,7 @@ package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
 import at.technikum.application.model.Credentials;
-import at.technikum.application.model.UserDataRec;
+import at.technikum.application.model.UserData;
 import at.technikum.application.repository.UsersRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
@@ -42,7 +42,7 @@ public class UserController implements Controller {
     private Response updateUser(RequestContext requestContext) {
         new Authorization().noBody(requestContext);
         new Authorization().areAuthorized(requestContext);
-        UserDataRec userData = requestContext.getBodyAs(UserDataRec.class);
+        UserData userData = requestContext.getBodyAs(UserData.class);
         return new Response(HttpStatus.OK, usersService.updateUser(requestContext.getPathVariable(), userData), Headers.CONTENT_TYPE_TEXT);
     }
 

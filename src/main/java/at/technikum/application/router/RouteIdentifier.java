@@ -2,14 +2,7 @@ package at.technikum.application.router;
 
 import java.util.Objects;
 
-public class RouteIdentifier {
-    private final String path;
-    private final String httpVerb;
-
-    public RouteIdentifier(String path, String httpVerb) {
-        this.path = path;
-        this.httpVerb = httpVerb;
-    }
+public record RouteIdentifier(String path, String httpVerb) {
 
     public static RouteIdentifier routeIdentifier(String path, String httpVerb) {
         return new RouteIdentifier(path, httpVerb);

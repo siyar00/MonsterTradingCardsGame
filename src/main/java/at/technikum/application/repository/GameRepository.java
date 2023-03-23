@@ -1,9 +1,11 @@
 package at.technikum.application.repository;
 
+import at.technikum.http.Response;
+
 public interface GameRepository {
-    String readStats();
+    String readStats(String username);
 
-    String readScoreboard();
+    String readScoreboard(String username);
 
-    String startBattle();
+    Response startBattle(String username);
 }

@@ -8,13 +8,15 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDataRec {
+@NoArgsConstructor
+public class UserStats {
     @JsonProperty("Name")
     String name;
-    @JsonProperty("Bio")
-    String bio;
-    @JsonProperty("Image")
-    String image;
+    @JsonProperty("Elo")
+    Integer elo;
+    @JsonProperty("Wins")
+    Integer wins;
+    @JsonProperty("Losses")
+    Integer losses;
 }

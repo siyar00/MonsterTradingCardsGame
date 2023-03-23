@@ -34,8 +34,9 @@ public class CardController implements Controller {
     private Response readUserDeck(RequestContext requestContext) {
         String username = new Authorization().isAuthorized(requestContext);
         Response response = cardService.showCurrentUserDeck(username);
-        if(requestContext.getFormat() == null || requestContext.getFormat().equals("plain"))
-            response.setHeaders(Collections.singletonList(Headers.CONTENT_TYPE_TEXT));
+        if (requestContext.getFormat() != null)
+            if (requestContext.getFormat().equals("plain"))
+                response.setHeaders(Collections.singletonList(Headers.CONTENT_TYPE_TEXT));
         return response;
     }
 
@@ -43,7 +44,8 @@ public class CardController implements Controller {
         String username = new Authorization().isAuthorized(requestContext);
         new Authorization().noBody(requestContext);
         String[] cardIds = requestContext.getBodyAs(String[].class);
-        if(cardIds.length != 4) throw new BadRequestException("The provided deck did not include the required amount of cards");
+        if (cardIds.length != 4)
+            throw new BadRequestException("The provided deck did not include the required amount of cards");
         return new Response(HttpStatus.OK, cardService.configureUserDeckWith4Cards(username, List.of(cardIds)), Headers.CONTENT_TYPE_TEXT);
     }
 

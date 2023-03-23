@@ -40,8 +40,8 @@ public class CardsRepositoryImpl implements CardsRepository {
                 );
             """;
 
-    private static final String READ_DECK = """
-            SELECT card_id, name, damage FROM cards c JOIN deck d ON c.card_id = d.card1
+    static final String READ_DECK = """
+            SELECT card_id, name, damage, card_type, element_type FROM cards c JOIN deck d ON c.card_id = d.card1
             OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4 WHERE d.user_id_fk = ?;
             """;
 

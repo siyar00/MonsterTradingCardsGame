@@ -1,6 +1,5 @@
 package at.technikum.application.util;
 
-import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.Credentials;
 import at.technikum.http.RequestContext;
 import at.technikum.http.exceptions.BadRequestException;
@@ -26,7 +25,7 @@ public record Authorization() {
 
     public void areAuthorized(@NotNull RequestContext requestContext) {
         String username = "";
-        String authorization = requestContext.getHeaders().get("Authorization");
+        String authorization = requestContext.getHeaders().get(AUTHORIZATION);
 
         if (requestContext.getHttpVerb() != null)
             username = requestContext.getPathVariable();

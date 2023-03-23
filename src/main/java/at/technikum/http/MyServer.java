@@ -19,13 +19,12 @@ public class MyServer {
             do {
                 try {
                     Socket socket = serverSocket.accept();
-                    RequestHandler requestHandler = new RequestHandler(socket, router);
-                    new Thread(requestHandler).start();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
+                    new Thread(new RequestHandler(socket, router)).start();
+                } catch (NullPointerException ignored) {
+                    //e.printStackTrace();
                 }
-            } while (true);
-        } catch (IOException e) {
+            } while (serverSocket.isBound());
+        } catch (IOException e ) {
             e.printStackTrace();
         }
     }

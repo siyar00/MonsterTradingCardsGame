@@ -3,7 +3,7 @@ package at.technikum.application.repository;
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.database.UsersDB;
 import at.technikum.application.model.Credentials;
-import at.technikum.application.model.UserDataRec;
+import at.technikum.application.model.UserData;
 import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.ExistingException;
 import at.technikum.http.exceptions.NotFoundException;
@@ -27,7 +27,11 @@ public class UsersRepositoryImpl implements UsersRepository {
                     coins INTEGER NOT NULL DEFAULT 22 CHECK (coins >= 0),
                     name TEXT,
                     bio TEXT,
-                    image TEXT
+                    image TEXT,
+                    elo INTEGER DEFAULT 100 NOT NULL,
+                    wins INTEGER DEFAULT 0 NOT NULL,
+                    losses INTEGER DEFAULT 0 NOT NULL,
+                    played INTEGER DEFAULT 0
                 )
             """;
 
@@ -103,11 +107,11 @@ public class UsersRepositoryImpl implements UsersRepository {
             assert connection != null;
             ResultSet rs = findUser(connection, username);
             try {
-                UserDataRec userDataRec = UserDataRec.builder()
+                UserData userData = UserData.builder()
                         .name(rs.getString(UsersDB.NAME.toString()))
                         .bio(rs.getString(UsersDB.BIO.toString()))
                         .image(rs.getString(UsersDB.IMAGE.toString())).build();
-                return new ObjectMapper().writeValueAsString(userDataRec);
+                return new ObjectMapper().writeValueAsString(userData);
             } finally {
                 connection.close();
             }
@@ -119,14 +123,14 @@ public class UsersRepositoryImpl implements UsersRepository {
     }
 
     @Override
-    public String updateUser(String username, UserDataRec userDataRec) {
+    public String updateUser(String username, UserData userData) {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             findUser(connection, username);
             try (PreparedStatement updateStmt = connection.prepareStatement(UPDATE_USER)) {
-                updateStmt.setString(1, userDataRec.getName());
-                updateStmt.setString(2, userDataRec.getBio());
-                updateStmt.setString(3, userDataRec.getImage());
+                updateStmt.setString(1, userData.getName());
+                updateStmt.setString(2, userData.getBio());
+                updateStmt.setString(3, userData.getImage());
                 updateStmt.setString(4, username);
                 if (updateStmt.executeUpdate() == 0) throw new SQLException("Could not register user!");
                 return "User successfully updated.";

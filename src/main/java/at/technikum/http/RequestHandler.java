@@ -3,14 +3,11 @@ package at.technikum.http;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
 import at.technikum.application.router.Router;
-import at.technikum.application.util.Headers;
 import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.Except;
-import at.technikum.http.exceptions.UnauthorizedException;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collections;
 
 public class RequestHandler implements Runnable {
 
@@ -31,19 +28,17 @@ public class RequestHandler implements Runnable {
             final RequestContext requestContext = new RequestContext().parseRequest(bufferedReader);
             //Can delete it afterwards
             System.out.println("Thread: " + Thread.currentThread().getName());
-            System.out.println(requestContext);
+            //System.out.println(requestContext);
 
             final Route route = router.findRoute(new RouteIdentifier(requestContext.getPath(), requestContext.getHttpVerb()));
-            Response response = new Response();
+            Response response;
             try {
+                if(route == null) throw new BadRequestException("Endpoint not available");
                 response = route.process(requestContext);
-            } catch (Except e) {
-                response.setBody(e.getMessage());
-                response.setHttpStatus(e.getHttpStatus());
-                response.setHeaders(Collections.singletonList(Headers.CONTENT_TYPE_TEXT));
+            }catch (Except e) {
+                response = new Response(e.getHttpStatus(), e.getMessage());
             } catch (IllegalStateException e) {
-                response.setBody(e.getMessage());
-                response.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                response = new Response(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
             }
 
             bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));

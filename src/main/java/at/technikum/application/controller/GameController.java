@@ -2,11 +2,12 @@ package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
 import at.technikum.application.repository.GameRepositoryImpl;
-import at.technikum.application.repository.UsersRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
 import at.technikum.application.service.GameService;
+import at.technikum.application.util.Authorization;
+import at.technikum.application.util.Headers;
 import at.technikum.application.util.Pair;
 import at.technikum.http.HttpStatus;
 import at.technikum.http.RequestContext;
@@ -24,15 +25,18 @@ public class GameController implements Controller {
     }
 
     private Response readStats(RequestContext requestContext) {
-        return new Response(HttpStatus.OK, gameService.readStats());
+        String username = new Authorization().isAuthorized(requestContext);
+        return new Response(HttpStatus.OK, gameService.readStats(username), Headers.CONTENT_TYPE_JSON);
     }
 
     private Response readScoreboard(RequestContext requestContext) {
-        return new Response(HttpStatus.OK, gameService.readScoreboard());
+        String username = new Authorization().isAuthorized(requestContext);
+        return new Response(HttpStatus.OK, gameService.readScoreboard(username), Headers.CONTENT_TYPE_JSON);
     }
 
     private Response startBattle(RequestContext requestContext) {
-        return new Response(HttpStatus.OK, gameService.startBattle());
+        String username = new Authorization().isAuthorized(requestContext);
+        return gameService.startBattle(username);
     }
 
     @Override
