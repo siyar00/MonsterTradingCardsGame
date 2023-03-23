@@ -26,7 +26,7 @@ public class RequestHandler implements Runnable {
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final RequestContext requestContext = new RequestContext().parseRequest(bufferedReader);
-            //Can delete it afterwards
+            //Can be deleted afterwards
             System.out.println("Thread: " + Thread.currentThread().getName());
             //System.out.println(requestContext);
 

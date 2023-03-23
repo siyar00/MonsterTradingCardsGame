@@ -31,6 +31,7 @@ public class UsersRepositoryImpl implements UsersRepository {
                     elo INTEGER DEFAULT 100 NOT NULL,
                     wins INTEGER DEFAULT 0 NOT NULL,
                     losses INTEGER DEFAULT 0 NOT NULL,
+                    draws INTEGER DEFAULT 0 NOT NULL,
                     played INTEGER DEFAULT 0
                 )
             """;

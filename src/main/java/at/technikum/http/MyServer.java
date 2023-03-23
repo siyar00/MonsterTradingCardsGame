@@ -17,14 +17,10 @@ public class MyServer {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(10001)) {
             do {
-                try {
-                    Socket socket = serverSocket.accept();
-                    new Thread(new RequestHandler(socket, router)).start();
-                } catch (NullPointerException ignored) {
-                    //e.printStackTrace();
-                }
+                Socket socket = serverSocket.accept();
+                new Thread(new RequestHandler(socket, router)).start();
             } while (serverSocket.isBound());
-        } catch (IOException e ) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -19,4 +19,8 @@ public class UserStats {
     Integer wins;
     @JsonProperty("Losses")
     Integer losses;
+    @JsonProperty("Draws")
+    Integer draws;
+    @JsonProperty("Played")
+    Integer played;
 }
