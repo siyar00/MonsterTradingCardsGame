@@ -1,7 +1,6 @@
 package at.technikum.application.repository;
 
 import at.technikum.application.config.DbConnector;
-import at.technikum.application.database.UsersDB;
 import at.technikum.application.model.Credentials;
 import at.technikum.application.model.UserData;
 import at.technikum.http.exceptions.BadRequestException;
@@ -17,47 +16,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UsersRepositoryImpl implements UsersRepository {
-
-    private static final String SETUP_TABLE = """
-                CREATE TABLE IF NOT EXISTS users(
-                    user_id SERIAL PRIMARY KEY,
-                    username TEXT NOT NULL UNIQUE,
-                    password TEXT NOT NULL,
-                    coins INTEGER NOT NULL DEFAULT 22 CHECK (coins >= 0),
-                    name TEXT,
-                    bio TEXT,
-                    image TEXT,
-                    elo INTEGER DEFAULT 100 NOT NULL,
-                    wins INTEGER DEFAULT 0 NOT NULL,
-                    losses INTEGER DEFAULT 0 NOT NULL,
-                    draws INTEGER DEFAULT 0 NOT NULL,
-                    played INTEGER DEFAULT 0
-                )
-            """;
-
-    private static final String SELECT_USER = """
-            SELECT * FROM users WHERE username = ?
-            """;
-    private static final String QUERY_USER_PASS = """
-            SELECT * FROM users WHERE username = ? AND password = ?
-            """;
-    private static final String INSERT_USER = """
-            INSERT INTO users (username, password) VALUES (?,?) RETURNING *
-            """;
-    private static final String UPDATE_USER = """
-            UPDATE users SET name = ?, bio = ?, image = ? WHERE username = ?
-            """;
-
-    private final DbConnector connector;
+public class UsersRepositoryImpl extends Repository implements UsersRepository {
 
     public UsersRepositoryImpl(@NotNull DbConnector connector) {
-        this.connector = connector;
-        try (PreparedStatement ps = connector.getConnection().prepareStatement(SETUP_TABLE)) {
-            ps.execute();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to setup up table: " + e);
-        }
+        super(connector);
     }
 
     @Override
@@ -96,7 +58,7 @@ public class UsersRepositoryImpl implements UsersRepository {
     }
 
     private void createDeckForUser(Connection connection, int user_id) throws SQLException {
-        PreparedStatement createDeckStmt = connection.prepareStatement("INSERT INTO deck(user_id_fk) VALUES (?)");
+        PreparedStatement createDeckStmt = connection.prepareStatement(INSERT_USERID_DECK);
         createDeckStmt.setInt(1, user_id);
         createDeckStmt.executeUpdate();
         createDeckStmt.close();
@@ -109,9 +71,9 @@ public class UsersRepositoryImpl implements UsersRepository {
             ResultSet rs = findUser(connection, username);
             try {
                 UserData userData = UserData.builder()
-                        .name(rs.getString(UsersDB.NAME.toString()))
-                        .bio(rs.getString(UsersDB.BIO.toString()))
-                        .image(rs.getString(UsersDB.IMAGE.toString())).build();
+                        .name(rs.getString("name"))
+                        .bio(rs.getString("bio"))
+                        .image(rs.getString("image")).build();
                 return new ObjectMapper().writeValueAsString(userData);
             } finally {
                 connection.close();

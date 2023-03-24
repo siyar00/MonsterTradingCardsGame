@@ -1,6 +1,7 @@
 package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
+import at.technikum.application.repository.BattleRepositoryImpl;
 import at.technikum.application.repository.GameRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
@@ -21,7 +22,7 @@ public class GameController implements Controller {
     private final GameService gameService;
 
     public GameController(DataSource dataSource) {
-        this.gameService = new GameService(new GameRepositoryImpl(dataSource));
+        this.gameService = new GameService(new GameRepositoryImpl(dataSource), new BattleRepositoryImpl(dataSource));
     }
 
     private Response readStats(RequestContext requestContext) {

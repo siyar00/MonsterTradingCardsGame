@@ -6,15 +6,10 @@ import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.UnauthorizedException;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 public record Authorization() {
     private static final String AUTHORIZATION = "Authorization";
 
-    public String isAuthorized(RequestContext requestContext) {
+    public @NotNull String isAuthorized(@NotNull RequestContext requestContext) {
         if (!requestContext.getHeaders().containsKey(AUTHORIZATION))
             throw new UnauthorizedException("Access token is missing or invalid");
         String token = requestContext.getHeaders().get(AUTHORIZATION);
@@ -47,14 +42,6 @@ public record Authorization() {
         if (requestContext.getBody().equals("")) throw new BadRequestException("No Body!");
         if (!requestContext.getHeaders().get("Content-Type").equals("application/json"))
             throw new BadRequestException("Content-Type is not declared");
-    }
-
-    public @NotNull ResultSet authorizeUser(String username, @NotNull Connection connection) throws SQLException {
-        PreparedStatement selectUser = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
-        selectUser.setString(1, username);
-        ResultSet rs = selectUser.executeQuery();
-        if (!rs.next()) throw new UnauthorizedException("Access token is missing or invalid");
-        return rs;
     }
 
 }

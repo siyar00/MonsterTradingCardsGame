@@ -1,9 +1,10 @@
 package at.technikum.application.service;
 
+import at.technikum.application.repository.BattleRepository;
 import at.technikum.application.repository.GameRepository;
 import at.technikum.http.Response;
 
-public record GameService(GameRepository gameRepository) {
+public record GameService(GameRepository gameRepository, BattleRepository battleRepository) {
     public String readStats(String username) {
         return gameRepository.readStats(username);
     }
@@ -13,6 +14,6 @@ public record GameService(GameRepository gameRepository) {
     }
 
     public Response startBattle(String username) {
-        return gameRepository.startBattle(username);
+        return battleRepository.startBattle(username);
     }
 }

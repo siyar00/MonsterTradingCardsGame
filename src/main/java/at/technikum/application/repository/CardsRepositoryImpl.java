@@ -2,7 +2,6 @@ package at.technikum.application.repository;
 
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.Card;
-import at.technikum.application.util.Authorization;
 import at.technikum.application.util.Headers;
 import at.technikum.http.HttpStatus;
 import at.technikum.http.Response;
@@ -19,43 +18,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardsRepositoryImpl implements CardsRepository {
-
-    private static final String SETUP_TABLE = """
-                CREATE TABLE IF NOT EXISTS cards (
-                    card_id TEXT NOT NULL PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    damage NUMERIC NOT NULL CHECK (damage >= 0),
-                    card_type TEXT,
-                    element_type TEXT,
-                    package_id_fk INTEGER DEFAULT NULL REFERENCES packages(package_id) ON DELETE CASCADE,
-                    user_id_fk INTEGER DEFAULT NULL REFERENCES users(user_id) ON DELETE SET NULL
-                );
-                CREATE TABLE IF NOT EXISTS deck (
-                    user_id_fk INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-                    card1 TEXT REFERENCES cards(card_id) ON DELETE SET NULL,
-                    card2 TEXT REFERENCES cards(card_id) ON DELETE SET NULL,
-                    card3 TEXT REFERENCES cards(card_id) ON DELETE SET NULL,
-                    card4 TEXT REFERENCES cards(card_id) ON DELETE SET NULL
-                );
-            """;
-
-    static final String READ_DECK = """
-            SELECT card_id, name, damage, card_type, element_type FROM cards c JOIN deck d ON c.card_id = d.card1
-            OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4 WHERE d.user_id_fk = ?;
-            """;
-
-    private final DbConnector connector;
+public class CardsRepositoryImpl extends Repository implements CardsRepository {
 
     public CardsRepositoryImpl(@NotNull DbConnector connector) {
-        this.connector = connector;
-        new PackagesRepositoryImpl(connector);
-        new UsersRepositoryImpl(connector);
-        try (PreparedStatement ps = connector.getConnection().prepareStatement(SETUP_TABLE)) {
-            ps.execute();
-        } catch (SQLException e) {
-            throw new IllegalStateException("Failed to setup up table: " + e);
-        }
+        super(connector);
     }
 
     @Override
@@ -63,8 +29,8 @@ public class CardsRepositoryImpl implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                ResultSet rs = new Authorization().authorizeUser(username, connection);
-                return getAllCardsFromUser(connection, rs.getInt("user_id"));
+                int userId = authorizeUser(username).getInt(USER_ID);
+                return getAllCardsFromUser(connection, userId);
             } finally {
                 connection.close();
             }
@@ -76,7 +42,7 @@ public class CardsRepositoryImpl implements CardsRepository {
     }
 
     private Response getAllCardsFromUser(Connection connection, int userId) throws SQLException, JsonProcessingException {
-        PreparedStatement selectPackageStmt = connection.prepareStatement("SELECT * FROM cards WHERE user_id_fk = ?");
+        PreparedStatement selectPackageStmt = connection.prepareStatement(SELECT_CARDS);
         selectPackageStmt.setInt(1, userId);
         ResultSet set = selectPackageStmt.executeQuery();
         if (!set.next())
@@ -89,8 +55,8 @@ public class CardsRepositoryImpl implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                ResultSet rs = new Authorization().authorizeUser(username, connection);
-                return getDeck(connection, rs.getInt("user_id"));
+                int userId = authorizeUser(username).getInt(USER_ID);
+                return getDeck(connection, userId);
             } finally {
                 connection.close();
             }
@@ -126,9 +92,9 @@ public class CardsRepositoryImpl implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                ResultSet rs = new Authorization().authorizeUser(username, connection);
-                cardsAvailable(connection, rs.getInt("user_id"), cardIds);
-                return updateDeck(connection, rs.getInt("user_id"), cardIds);
+                int userId = authorizeUser(username).getInt(USER_ID);
+                cardsAvailable(connection, userId, cardIds);
+                return updateDeck(connection, userId, cardIds);
             } finally {
                 connection.close();
             }
@@ -138,7 +104,7 @@ public class CardsRepositoryImpl implements CardsRepository {
     }
 
     private void cardsAvailable(Connection connection, int userId, List<String> cardIds) throws SQLException {
-        PreparedStatement selectStmt = connection.prepareStatement("SELECT count(*) AS rowNr FROM cards WHERE user_id_fk = ? AND card_id IN (?,?,?,?)");
+        PreparedStatement selectStmt = connection.prepareStatement(CARDS_AVAILABILITY);
         int count = 0;
         selectStmt.setInt(++count, userId);
         for (String cardId : cardIds) selectStmt.setString(++count, cardId);
@@ -149,7 +115,7 @@ public class CardsRepositoryImpl implements CardsRepository {
     }
 
     private String updateDeck(Connection connection, int userId, List<String> cardIds) throws SQLException {
-        PreparedStatement updateCardsStmt = connection.prepareStatement("UPDATE deck SET card1 = ?, card2 = ?, card3 = ?, card4 = ? WHERE user_id_fk = ?");
+        PreparedStatement updateCardsStmt = connection.prepareStatement(UPDATE_DECK);
         int count = 0;
         for (String cardId : cardIds) updateCardsStmt.setString(++count, cardId);
         updateCardsStmt.setInt(++count, userId);
