@@ -22,13 +22,13 @@ public class Repository {
         }
     }
 
-    protected ResultSet authorizeUser(String username) {
+    protected int authorizeUser(String username) {
         try (Connection connection = connector.getConnection()) {
             try (PreparedStatement selectUser = connection.prepareStatement(SELECT_USER)) {
                 selectUser.setString(1, username);
                 ResultSet rs = selectUser.executeQuery();
                 if (!rs.next()) throw new UnauthorizedException("Access token is missing or invalid");
-                return rs;
+                return rs.getInt(USER_ID);
             } finally {
                 connection.close();
             }
@@ -82,12 +82,14 @@ public class Repository {
             """;
     protected static final String UPDATE_PACKAGES = """
             UPDATE packages SET sold = true WHERE package_id =
-            (SELECT package_id FROM packages WHERE sold = false ORDER BY RANDOM() LIMIT 1)
+            (SELECT package_id FROM packages WHERE sold = false ORDER BY package_id /*RANDOM()*/ LIMIT 1)
             RETURNING *
             """;
-    protected static final String UPDATE_USER_CARDS = """
+    protected static final String UPDATE_USER_COINS = """
             UPDATE users SET coins = coins - 5 WHERE user_id = ?;
-            UPDATE cards SET user_id_fk = ? WHERE package_id_fk = ? RETURNING *;
+            """;
+    protected static final String UPDATE_USER_CARDS = """
+            UPDATE cards SET user_id_fk = ? WHERE package_id_fk = ? RETURNING *
             """;
 
     /**
@@ -129,6 +131,9 @@ public class Repository {
     protected static final String COIN_CHANGE = """
             UPDATE users SET coins = coins - 1 WHERE user_id = ?;
             UPDATE users SET coins = coins + 1 WHERE user_id = (SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?);
+            """;
+    protected static final String DELETE_TRADING = """
+            UPDATE users SET coins = coins - 5 WHERE user_id = ?;
             """;
 
     /**

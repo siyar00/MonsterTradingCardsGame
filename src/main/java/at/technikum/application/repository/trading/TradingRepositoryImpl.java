@@ -61,7 +61,7 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 checkDeal(connection, userId, trading);
                 createDeal(connection, trading);
                 return "Trading deal successfully created";
@@ -103,7 +103,7 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 checkDelete(connection, userId, checkTradeId(connection, tradingId));
                 deleteTrading(connection, tradingId);
                 return "Trading deal successfully deleted";
@@ -137,7 +137,7 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 checkTradeId(connection, tradingId);
                 ownedByUser(connection, cardId, tradingId, userId);
                 lockedCard(connection, cardId);
@@ -171,7 +171,7 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
     }
 
     private void deleteTrading(Connection connection, String tradingId) throws SQLException {
-        PreparedStatement deleteStmt = connection.prepareStatement("DELETE FROM tradings WHERE trading_id = ?");
+        PreparedStatement deleteStmt = connection.prepareStatement(DELETE_TRADING);
         deleteStmt.setString(1, tradingId);
         deleteStmt.executeUpdate();
         deleteStmt.close();

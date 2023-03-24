@@ -65,7 +65,7 @@ public class BattleRepositoryImpl extends Repository implements BattleRepository
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 Response deck = getDeck(connection, userId, username);
                 if (deck.getHttpStatus().equals(HttpStatus.OK)) {
                     List<CardRec> temp = List.of(new ObjectMapper().readValue(deck.getBody(), CardRec[].class));
@@ -159,7 +159,7 @@ public class BattleRepositoryImpl extends Repository implements BattleRepository
             WAITING_ROOM.clear();
             if (BATTLE_START) {
                 BATTLE_START = false;
-                return new Response(HttpStatus.OK, battleLog.toString());
+                return new Response(HttpStatus.OK, "For testing Response not provided!" /*battleLog.toString()*/);
             } else {
                 throw new NotFoundException("No opponent available!");
             }

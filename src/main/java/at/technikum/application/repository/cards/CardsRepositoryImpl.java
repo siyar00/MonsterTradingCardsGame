@@ -30,7 +30,7 @@ public class CardsRepositoryImpl extends Repository implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 return getAllCardsFromUser(connection, userId);
             } finally {
                 connection.close();
@@ -56,7 +56,7 @@ public class CardsRepositoryImpl extends Repository implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 return getDeck(connection, userId);
             } finally {
                 connection.close();
@@ -93,7 +93,7 @@ public class CardsRepositoryImpl extends Repository implements CardsRepository {
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = authorizeUser(username).getInt(USER_ID);
+                int userId = authorizeUser(username);
                 cardsAvailable(connection, userId, cardIds);
                 return updateDeck(connection, userId, cardIds);
             } finally {

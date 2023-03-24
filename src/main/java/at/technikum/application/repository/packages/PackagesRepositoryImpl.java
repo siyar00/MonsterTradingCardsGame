@@ -3,10 +3,7 @@ package at.technikum.application.repository.packages;
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.Card;
 import at.technikum.application.repository.Repository;
-import at.technikum.http.exceptions.BadRequestException;
-import at.technikum.http.exceptions.ExistingException;
-import at.technikum.http.exceptions.ForbiddenException;
-import at.technikum.http.exceptions.NotFoundException;
+import at.technikum.http.exceptions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -93,7 +90,7 @@ public class PackagesRepositoryImpl extends Repository implements PackagesReposi
         try (Connection connection = connector.getConnection()) {
             assert connection != null;
             try {
-                int userId = existingUser(username);
+                int userId = existingUserAndCoins(username, connection);
                 return sellPackage(connection, userId);
             } finally {
                 connection.close();
@@ -105,8 +102,11 @@ public class PackagesRepositoryImpl extends Repository implements PackagesReposi
         }
     }
 
-    private int existingUser(String username) throws SQLException {
-        ResultSet rs = authorizeUser(username);
+    private int existingUserAndCoins(String username, Connection connection) throws SQLException {
+        PreparedStatement selectCoins = connection.prepareStatement(SELECT_USER);
+        selectCoins.setString(1, username);
+        ResultSet rs = selectCoins.executeQuery();
+        if (!rs.next()) throw new UnauthorizedException("Access token is missing or invalid");
         if (rs.getInt("coins") < 5) throw new ForbiddenException("Not enough money for buying a card package");
         return rs.getInt(USER_ID);
     }
@@ -120,8 +120,7 @@ public class PackagesRepositoryImpl extends Repository implements PackagesReposi
 
         PreparedStatement updateUserCards = connection.prepareStatement(UPDATE_USER_CARDS);
         updateUserCards.setInt(1, userId);
-        updateUserCards.setInt(2, userId);
-        updateUserCards.setInt(3, package_id);
+        updateUserCards.setInt(2, package_id);
         ResultSet set = updateUserCards.executeQuery();
         List<Card> cardList = new ArrayList<>();
         while (set.next()) {
@@ -131,6 +130,10 @@ public class PackagesRepositoryImpl extends Repository implements PackagesReposi
                     .damage(set.getDouble("damage")).build());
         }
         updateUserCards.close();
+        PreparedStatement updateUserCoins = connection.prepareStatement(UPDATE_USER_COINS);
+        updateUserCoins.setInt(1, userId);
+        updateUserCoins.executeUpdate();
+        updateUserCoins.close();
         return new ObjectMapper().writeValueAsString(cardList);
     }
 
