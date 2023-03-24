@@ -95,6 +95,7 @@ public class CardsRepositoryImpl extends Repository implements CardsRepository {
             try {
                 int userId = authorizeUser(username);
                 cardsAvailable(connection, userId, cardIds);
+                cardsInTrading(connection, cardIds);
                 return updateDeck(connection, userId, cardIds);
             } finally {
                 connection.close();
@@ -102,6 +103,14 @@ public class CardsRepositoryImpl extends Repository implements CardsRepository {
         } catch (SQLException e) {
             throw new IllegalStateException("DB query failed: " + e);
         }
+    }
+
+    private void cardsInTrading(Connection connection, List<String> cardIds) throws SQLException {
+        PreparedStatement selectStmt = connection.prepareStatement(CHECK_NOT_IN_TRADE);
+        int count = 0;
+        for (String cardId : cardIds) selectStmt.setString(++count, cardId);
+        ResultSet rs = selectStmt.executeQuery();
+        if (rs.next()) throw new ForbiddenException("At least one of the provided cards is in a trading deal.");
     }
 
     private void cardsAvailable(Connection connection, int userId, List<String> cardIds) throws SQLException {

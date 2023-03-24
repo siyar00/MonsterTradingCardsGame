@@ -73,6 +73,9 @@ public class Repository {
     protected static final String UPDATE_DECK = """
             UPDATE deck SET card1 = ?, card2 = ?, card3 = ?, card4 = ? WHERE user_id_fk = ?
             """;
+    protected static final String CHECK_NOT_IN_TRADE = """
+            SELECT card_to_trade FROM tradings WHERE card_to_trade IN (?,?,?,?)
+            """;
 
     /**
      * Packages
