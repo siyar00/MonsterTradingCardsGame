@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.battle;
 
 import at.technikum.http.Response;
 

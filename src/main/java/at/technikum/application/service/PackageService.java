@@ -1,7 +1,7 @@
 package at.technikum.application.service;
 
 import at.technikum.application.model.Card;
-import at.technikum.application.repository.PackagesRepository;
+import at.technikum.application.repository.packages.PackagesRepository;
 
 import java.util.List;
 

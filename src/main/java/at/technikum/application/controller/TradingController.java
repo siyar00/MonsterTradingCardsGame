@@ -2,7 +2,7 @@ package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
 import at.technikum.application.model.Trading;
-import at.technikum.application.repository.TradingRepositoryImpl;
+import at.technikum.application.repository.trading.TradingRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;

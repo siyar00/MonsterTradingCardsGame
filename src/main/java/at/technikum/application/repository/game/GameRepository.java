@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.game;
 
 public interface GameRepository {
     String readStats(String username);

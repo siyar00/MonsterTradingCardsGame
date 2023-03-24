@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.users;
 
 import at.technikum.application.model.Credentials;
 import at.technikum.application.model.UserData;

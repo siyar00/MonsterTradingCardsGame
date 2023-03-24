@@ -1,7 +1,7 @@
 package at.technikum.application.service;
 
-import at.technikum.application.repository.BattleRepository;
-import at.technikum.application.repository.GameRepository;
+import at.technikum.application.repository.battle.BattleRepository;
+import at.technikum.application.repository.game.GameRepository;
 import at.technikum.http.Response;
 
 public record GameService(GameRepository gameRepository, BattleRepository battleRepository) {

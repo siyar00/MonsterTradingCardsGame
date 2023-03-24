@@ -1,7 +1,7 @@
 package at.technikum.application.service;
 
 import at.technikum.application.model.Trading;
-import at.technikum.application.repository.TradingRepository;
+import at.technikum.application.repository.trading.TradingRepository;
 import at.technikum.http.Response;
 
 public record TradingService(TradingRepository tradingRepository) {

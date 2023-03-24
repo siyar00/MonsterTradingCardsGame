@@ -1,7 +1,8 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.game;
 
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.UserStats;
+import at.technikum.application.repository.Repository;
 import at.technikum.http.exceptions.BadRequestException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

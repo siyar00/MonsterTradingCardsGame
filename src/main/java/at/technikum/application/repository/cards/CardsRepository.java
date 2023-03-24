@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.cards;
 
 import at.technikum.http.Response;
 

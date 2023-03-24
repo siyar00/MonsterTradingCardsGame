@@ -2,7 +2,7 @@ package at.technikum.application.service;
 
 import at.technikum.application.model.Credentials;
 import at.technikum.application.model.UserData;
-import at.technikum.application.repository.UsersRepository;
+import at.technikum.application.repository.users.UsersRepository;
 
 public record UsersService(UsersRepository usersRepository) {
     public String registerUser(Credentials credentials){

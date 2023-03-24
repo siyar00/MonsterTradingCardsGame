@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.trading;
 
 import at.technikum.application.model.Trading;
 import at.technikum.http.Response;

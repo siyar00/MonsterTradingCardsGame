@@ -1,7 +1,8 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.packages;
 
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.Card;
+import at.technikum.application.repository.Repository;
 import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.ExistingException;
 import at.technikum.http.exceptions.ForbiddenException;

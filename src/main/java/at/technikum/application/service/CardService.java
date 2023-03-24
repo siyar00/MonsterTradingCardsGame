@@ -1,6 +1,6 @@
 package at.technikum.application.service;
 
-import at.technikum.application.repository.CardsRepository;
+import at.technikum.application.repository.cards.CardsRepository;
 import at.technikum.http.Response;
 
 import java.util.List;

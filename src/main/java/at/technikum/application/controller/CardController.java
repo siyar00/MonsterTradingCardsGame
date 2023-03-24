@@ -1,7 +1,7 @@
 package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
-import at.technikum.application.repository.CardsRepositoryImpl;
+import at.technikum.application.repository.cards.CardsRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;

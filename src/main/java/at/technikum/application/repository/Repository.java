@@ -23,8 +23,8 @@ public class Repository {
     }
 
     protected ResultSet authorizeUser(String username) {
-        try (Connection connection = connector.getConnection()){
-            try (PreparedStatement selectUser = connection.prepareStatement(SELECT_USER)){
+        try (Connection connection = connector.getConnection()) {
+            try (PreparedStatement selectUser = connection.prepareStatement(SELECT_USER)) {
                 selectUser.setString(1, username);
                 ResultSet rs = selectUser.executeQuery();
                 if (!rs.next()) throw new UnauthorizedException("Access token is missing or invalid");
@@ -37,7 +37,9 @@ public class Repository {
         }
     }
 
-    /** User */
+    /**
+     * User
+     */
     protected static final String USER_ID = "user_id";
     protected static final String SELECT_USER = """
             SELECT * FROM users WHERE username = ?
@@ -55,7 +57,9 @@ public class Repository {
             INSERT INTO deck(user_id_fk) VALUES (?)
             """;
 
-    /** Cards */
+    /**
+     * Cards
+     */
     protected static final String SELECT_CARDS = """
             SELECT * FROM cards WHERE user_id_fk = ?
             """;
@@ -64,13 +68,15 @@ public class Repository {
             OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4 WHERE d.user_id_fk = ?;
             """;
     protected static final String CARDS_AVAILABILITY = """
-    SELECT count(*) AS rowNr FROM cards WHERE user_id_fk = ? AND card_id IN (?,?,?,?)
-    """;
+            SELECT count(*) AS rowNr FROM cards WHERE user_id_fk = ? AND card_id IN (?,?,?,?)
+            """;
     protected static final String UPDATE_DECK = """
             UPDATE deck SET card1 = ?, card2 = ?, card3 = ?, card4 = ? WHERE user_id_fk = ?
             """;
 
-    /** Packages */
+    /**
+     * Packages
+     */
     protected static final String INSERT_PACKAGES = """
             INSERT INTO packages (card1, card2, card3, card4, card5) VALUES (?,?,?,?,?)
             """;
@@ -84,7 +90,9 @@ public class Repository {
             UPDATE cards SET user_id_fk = ? WHERE package_id_fk = ? RETURNING *;
             """;
 
-    /** Trading */
+    /**
+     * Trading
+     */
     protected static final String CHECK_CARDS = """
             SELECT * FROM cards c JOIN deck d ON c.user_id_fk = d.user_id_fk
             WHERE c.user_id_fk = ? AND card_id != card1 AND card_id != card2 AND card_id != card3 AND card_id != card4
@@ -123,7 +131,9 @@ public class Repository {
             UPDATE users SET coins = coins + 1 WHERE user_id = (SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?);
             """;
 
-    /** Game */
+    /**
+     * Game
+     */
     protected static final String READ_SCOREBOARD = """
             SELECT * FROM users ORDER BY elo DESC, wins DESC, losses DESC, played DESC, draws DESC, username DESC
             """;

@@ -1,8 +1,8 @@
 package at.technikum.application.controller;
 
 import at.technikum.application.config.DataSource;
-import at.technikum.application.repository.BattleRepositoryImpl;
-import at.technikum.application.repository.GameRepositoryImpl;
+import at.technikum.application.repository.battle.BattleRepositoryImpl;
+import at.technikum.application.repository.game.GameRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;

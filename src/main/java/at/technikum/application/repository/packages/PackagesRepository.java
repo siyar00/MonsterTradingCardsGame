@@ -1,4 +1,4 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.packages;
 
 import at.technikum.application.model.Card;
 

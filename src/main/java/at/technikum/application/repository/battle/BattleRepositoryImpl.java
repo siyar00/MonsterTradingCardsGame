@@ -1,7 +1,8 @@
-package at.technikum.application.repository;
+package at.technikum.application.repository.battle;
 
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.CardRec;
+import at.technikum.application.repository.Repository;
 import at.technikum.application.util.Headers;
 import at.technikum.http.HttpStatus;
 import at.technikum.http.Response;
