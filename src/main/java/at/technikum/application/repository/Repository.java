@@ -89,7 +89,7 @@ public class Repository {
             RETURNING *
             """;
     protected static final String UPDATE_USER_COINS = """
-            UPDATE users SET coins = coins - 5 WHERE user_id = ?;
+            UPDATE users SET coins = coins - 5 WHERE user_id = ?
             """;
     protected static final String UPDATE_USER_CARDS = """
             UPDATE cards SET user_id_fk = ? WHERE package_id_fk = ? RETURNING *
@@ -103,7 +103,7 @@ public class Repository {
             WHERE c.user_id_fk = ? AND card_id != card1 AND card_id != card2 AND card_id != card3 AND card_id != card4
             AND card_id = ?;
             """;
-    protected static final String INSERT_QUERY = """
+    protected static final String INSERT_TRADING_DEAL = """
             INSERT INTO tradings(trading_id, card_to_trade, card_type, minimum_damage) VALUES(?,?,?,?)
             """;
     protected static final String TRADE_FOR_SELLER = """
@@ -136,7 +136,7 @@ public class Repository {
             UPDATE users SET coins = coins + 1 WHERE user_id = (SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?);
             """;
     protected static final String DELETE_TRADING = """
-            UPDATE users SET coins = coins - 5 WHERE user_id = ?;
+            DELETE FROM tradings WHERE trading_id = ?
             """;
 
     /**

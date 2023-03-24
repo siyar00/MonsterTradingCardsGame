@@ -89,7 +89,7 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
     }
 
     private void createDeal(Connection connection, Trading trading) throws SQLException {
-        PreparedStatement insertStmt = connection.prepareStatement(INSERT_QUERY);
+        PreparedStatement insertStmt = connection.prepareStatement(INSERT_TRADING_DEAL);
         insertStmt.setString(1, trading.getId());
         insertStmt.setString(2, trading.getCardToTrade());
         insertStmt.setString(3, trading.getType());
