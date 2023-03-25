@@ -14,7 +14,6 @@ public class MarketRepositoryImpl extends Repository implements MarketRepository
         super(connector);
     }
 
-
     @Override
     public String changeManaToCoins(String username) {
         try(Connection connection = connector.getConnection()){
