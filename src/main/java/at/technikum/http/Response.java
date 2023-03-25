@@ -1,6 +1,5 @@
 package at.technikum.http;
 
-import at.technikum.application.util.Headers;
 import lombok.Data;
 
 import java.util.ArrayList;
