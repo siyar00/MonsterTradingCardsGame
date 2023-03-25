@@ -7,7 +7,7 @@ import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
 import at.technikum.application.service.CardService;
 import at.technikum.application.util.Authorization;
-import at.technikum.application.util.Headers;
+import at.technikum.http.Headers;
 import at.technikum.application.util.Pair;
 import at.technikum.http.HttpStatus;
 import at.technikum.http.RequestContext;

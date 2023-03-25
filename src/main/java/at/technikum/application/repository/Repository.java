@@ -172,7 +172,8 @@ public class Repository {
                     wins INTEGER DEFAULT 0 NOT NULL,
                     losses INTEGER DEFAULT 0 NOT NULL,
                     draws INTEGER DEFAULT 0 NOT NULL,
-                    played INTEGER DEFAULT 0
+                    played INTEGER DEFAULT 0 NOT NULL,
+                    mana INTEGER DEFAULT 0 NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS packages (
                 	package_id SERIAL PRIMARY KEY,

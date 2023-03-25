@@ -1,4 +1,4 @@
-package at.technikum.application.util;
+package at.technikum.http;
 
 public enum Headers {
     CONTENT_TYPE_JSON("Content-Type", "application/json"),

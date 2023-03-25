@@ -3,7 +3,7 @@ package at.technikum.application.repository.battle;
 import at.technikum.application.config.DbConnector;
 import at.technikum.application.model.CardRec;
 import at.technikum.application.repository.Repository;
-import at.technikum.application.util.Headers;
+import at.technikum.http.Headers;
 import at.technikum.http.HttpStatus;
 import at.technikum.http.Response;
 import at.technikum.http.exceptions.BadRequestException;
@@ -25,11 +25,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BattleRepositoryImpl extends Repository implements BattleRepository {
 
     private static final String UPDATE_USER_STATS = """
-            UPDATE users SET wins = wins + 1, played = played + 1, elo = elo + 5 WHERE username = ?;
-            UPDATE users SET losses = losses + 1, played = played + 1, elo = elo - 3 WHERE username = ?;
+            UPDATE users SET wins = wins + 1, played = played + 1, elo = elo + 5, mana = mana + 10 WHERE username = ?;
+            UPDATE users SET losses = losses + 1, played = played + 1, elo = elo - 3, mana = mana + 3 WHERE username = ?;
             """;
     private static final String UPDATE_USER_STATS_DRAW = """
-            UPDATE users SET draws = draws + 1, played = played + 1 WHERE username IN (?,?)
+            UPDATE users SET draws = draws + 1, played = played + 1, mana = mana + 5 WHERE username IN (?,?)
             """;
 
     private static final StringBuilder battleLog = new StringBuilder();
