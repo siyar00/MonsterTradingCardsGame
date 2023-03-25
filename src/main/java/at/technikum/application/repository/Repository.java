@@ -1,6 +1,7 @@
 package at.technikum.application.repository;
 
 import at.technikum.application.config.DbConnector;
+import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.UnauthorizedException;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +66,7 @@ public class Repository {
             """;
     protected static final String READ_DECK = """
             SELECT card_id, name, damage, card_type, element_type FROM cards c JOIN deck d ON c.card_id = d.card1
-            OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4 WHERE d.user_id_fk = ?;
+            OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4 WHERE d.user_id_fk = ?
             """;
     protected static final String CARDS_AVAILABILITY = """
             SELECT count(*) AS rowNr FROM cards WHERE user_id_fk = ? AND card_id IN (?,?,?,?)
@@ -101,7 +102,7 @@ public class Repository {
     protected static final String CHECK_CARDS = """
             SELECT * FROM cards c JOIN deck d ON c.user_id_fk = d.user_id_fk
             WHERE c.user_id_fk = ? AND card_id != card1 AND card_id != card2 AND card_id != card3 AND card_id != card4
-            AND card_id = ?;
+            AND card_id = ?
             """;
     protected static final String INSERT_TRADING_DEAL = """
             INSERT INTO tradings(trading_id, card_to_trade, card_type, minimum_damage) VALUES(?,?,?,?)
@@ -136,7 +137,7 @@ public class Repository {
             UPDATE users SET coins = coins + 1 WHERE user_id = (SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?);
             """;
     protected static final String DELETE_TRADING = """
-            DELETE FROM tradings WHERE trading_id = ?
+            DELETE FROM tradings WHERE trading_id = ?;
             """;
 
     /**
@@ -148,12 +149,22 @@ public class Repository {
     protected static final String READ_STATS = """
             SELECT * FROM users WHERE username = ?
             """;
+
+    /**
+     * Battle
+     */
+    protected static final String WINNER_GET_CARDS = """
+            UPDATE cards SET user_id_fk = ? WHERE card_id IN (SELECT card_id FROM cards c JOIN deck d
+            ON d.card1 = c.card_id OR d.card2 = c.card_id OR d.card3 = c.card_id OR d.card4 = c.card_id WHERE d.user_id_fk = ?);
+            UPDATE deck SET card1 = NULL, card2 = NULL, card3 = NULL, card4 = NULL WHERE user_id_fk = ?;
+            """;
+
     private static final String SETUP_TABLE = """
                 CREATE TABLE IF NOT EXISTS users (
                     user_id SERIAL PRIMARY KEY,
                     username TEXT NOT NULL UNIQUE,
                     password TEXT NOT NULL,
-                    coins INTEGER NOT NULL DEFAULT 22 CHECK (coins >= 0),
+                    coins INTEGER NOT NULL DEFAULT 20 CHECK (coins >= 0),
                     name TEXT,
                     bio TEXT,
                     image TEXT,
@@ -192,9 +203,19 @@ public class Repository {
                     trading_id TEXT PRIMARY KEY,
                     card_to_trade TEXT REFERENCES cards(card_id) ON DELETE CASCADE,
                     card_type TEXT,
-                    element TEXT,
                     minimum_damage NUMERIC
                 );
             """;
+
+
+    protected void coinChange(Connection connection, String tradingId, int boughtCard) {
+        try (PreparedStatement coinChange = connection.prepareStatement(COIN_CHANGE)) {
+            coinChange.setInt(1, boughtCard);
+            coinChange.setString(1, tradingId);
+            coinChange.execute();
+        } catch (SQLException e) {
+            throw new BadRequestException("Not enough coins to buy card.");
+        }
+    }
 
 }

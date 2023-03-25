@@ -139,9 +139,9 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
             try {
                 int userId = authorizeUser(username);
                 checkTradeId(connection, tradingId);
-                ownedByUser(connection, cardId, tradingId, userId);
-                lockedCard(connection, cardId);
                 selfTrade(connection, tradingId, userId);
+                ownedByUser(connection, tradingId, cardId, userId);
+                lockedCard(connection, cardId);
                 trading(connection, tradingId, cardId, userId);
                 return "Trading deal successfully executed.";
             } finally {
@@ -153,7 +153,6 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
     }
 
     private void trading(Connection connection, String tradingId, String cardId, int user_id) throws SQLException {
-        coinChange(connection, tradingId, user_id);
         PreparedStatement updateFirstStmt = connection.prepareStatement(TRADE_FOR_SELLER);
         updateFirstStmt.setString(1, tradingId);
         updateFirstStmt.setString(2, cardId);
@@ -177,17 +176,8 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
         deleteStmt.close();
     }
 
-    private void coinChange(Connection connection, String tradingId, int boughtCard) {
-        try (PreparedStatement coinChange = connection.prepareStatement(COIN_CHANGE)) {
-            coinChange.setInt(1, boughtCard);
-            coinChange.setString(1, tradingId);
-            coinChange.execute();
-        } catch (SQLException e) {
-            throw new BadRequestException("Not enough coins to buy card.");
-        }
-    }
-
     private void ownedByUser(Connection connection, String tradingId, String cardId, int userId) throws SQLException {
+        System.out.println(cardId + " " + userId);
         PreparedStatement selectStmt = connection.prepareStatement(SELECT_TRADING_CARD_OWNER);
         selectStmt.setString(1, cardId);
         selectStmt.setInt(2, userId);
@@ -219,6 +209,6 @@ public class TradingRepositoryImpl extends Repository implements TradingReposito
         selectStmt.setString(1, tradingId);
         ResultSet rs = selectStmt.executeQuery();
         rs.next();
-        if (rs.getInt("user_id_fk") == userId) throw new ForbiddenException("The offered card is owned by the user!");
+        if (rs.getInt("user_id_fk") == userId) throw new ForbiddenException("The offered card to trade is owned by the user!");
     }
 }

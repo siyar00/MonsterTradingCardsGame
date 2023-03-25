@@ -152,14 +152,18 @@ public class BattleRepositoryImpl extends Repository implements BattleRepository
             fight(user1, user2);
             BATTLE_START = true;
             notify();
-            return new Response(HttpStatus.OK, battleLog.toString());
+            String log = battleLog.toString();
+            battleLog.setLength(0);
+            return new Response(HttpStatus.OK, log);
         } else {
             USER_DECK_LISTS.put(username, userDeck);
             waiting();
             WAITING_ROOM.clear();
             if (BATTLE_START) {
                 BATTLE_START = false;
-                return new Response(HttpStatus.OK, "For testing Response not provided!" /*battleLog.toString()*/);
+                //String log = battleLog.toString();
+                battleLog.setLength(0);
+                return new Response(HttpStatus.OK, "For testing Response not provided!" /*log*/);
             } else {
                 throw new NotFoundException("No opponent available!");
             }
@@ -210,18 +214,36 @@ public class BattleRepositoryImpl extends Repository implements BattleRepository
 
             if (firstPlayerDeck.isEmpty()) {
                 result = GAME.WIN_PLAYER2;
+                giveCardsOver(user2, user1);
                 break;
             } else if (secondPlayerDeck.isEmpty()) {
                 result = GAME.WIN_PLAYER1;
+                giveCardsOver(user1, user2);
                 break;
             } else {
                 result = GAME.DRAW;
             }
         }
         changeStats(user1, user2, result);
-        if (firstPlayerDeck.isEmpty()) battleLog.append(user2.toUpperCase()).append(" WON!\n");
-        else if (secondPlayerDeck.isEmpty()) battleLog.append(user1.toUpperCase()).append(" WON!\n");
+        if (firstPlayerDeck.isEmpty()) battleLog.append(user2.toUpperCase()).append(" WON! ").append(user1.toUpperCase()).append(" lost all his cards!\n");
+        else if (secondPlayerDeck.isEmpty()) battleLog.append(user1.toUpperCase()).append(" WON!\n").append(user2.toUpperCase()).append(" lost all his cards!\n");
         else battleLog.append("\nSorry it is a DRAW! Maybe play again.");
+    }
+
+    private void giveCardsOver(String winner, String looser) {
+        try(Connection connection = connector.getConnection()){
+            try (PreparedStatement updateStmt = connection.prepareStatement(WINNER_GET_CARDS)){
+                updateStmt.setInt(1, authorizeUser(winner));
+                updateStmt.setInt(2, authorizeUser(looser));
+                updateStmt.setInt(3, authorizeUser(looser));
+                updateStmt.executeUpdate();
+            } finally {
+                connection.close();
+            }
+        } catch (SQLException e){
+            notify();
+            throw new IllegalStateException("DB query failed: " + e);
+        }
     }
 
     private void logger(CardRec firstPlayerCard, CardRec secondPlayerCard, String specialLog) {
