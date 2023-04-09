@@ -7,7 +7,7 @@ import at.technikum.application.repository.users.UsersRepositoryImpl;
 import at.technikum.application.router.Controller;
 import at.technikum.application.router.Route;
 import at.technikum.application.router.RouteIdentifier;
-import at.technikum.application.service.UsersService;
+import at.technikum.application.service.UserService;
 import at.technikum.application.util.Authorization;
 import at.technikum.http.Headers;
 import at.technikum.application.util.Pair;
@@ -22,34 +22,34 @@ import static at.technikum.application.router.RouteIdentifier.routeIdentifier;
 
 public class UserController implements Controller {
 
-    private final UsersService usersService;
+    private final UserService userService;
 
     public UserController(DataSource dataSource) {
-        this.usersService = new UsersService(new UsersRepositoryImpl(dataSource));
+        this.userService = new UserService(new UsersRepositoryImpl(dataSource));
     }
 
-    private Response registerUser(RequestContext requestContext) {
+    Response registerUser(RequestContext requestContext) {
         new Authorization().noBody(requestContext);
         Credentials credentials = requestContext.getBodyAs(Credentials.class);
-        return new Response(HttpStatus.CREATED, usersService.registerUser(credentials), Headers.CONTENT_TYPE_TEXT);
+        return new Response(HttpStatus.CREATED, userService.registerUser(credentials), Headers.CONTENT_TYPE_TEXT);
     }
 
-    private Response readUser(RequestContext requestContext) {
+    Response readUser(RequestContext requestContext) {
         new Authorization().areAuthorized(requestContext);
-        return new Response(HttpStatus.OK, usersService.readUserData(requestContext.getPathVariable()), Headers.CONTENT_TYPE_JSON);
+        return new Response(HttpStatus.OK, userService.readUserData(requestContext.getPathVariable()), Headers.CONTENT_TYPE_JSON);
     }
 
-    private Response updateUser(RequestContext requestContext) {
+    Response updateUser(RequestContext requestContext) {
         new Authorization().noBody(requestContext);
         new Authorization().areAuthorized(requestContext);
         UserData userData = requestContext.getBodyAs(UserData.class);
-        return new Response(HttpStatus.OK, usersService.updateUser(requestContext.getPathVariable(), userData), Headers.CONTENT_TYPE_TEXT);
+        return new Response(HttpStatus.OK, userService.updateUser(requestContext.getPathVariable(), userData), Headers.CONTENT_TYPE_TEXT);
     }
 
-    private Response loginUser(RequestContext requestContext) {
+    Response loginUser(RequestContext requestContext) {
         new Authorization().noBody(requestContext);
         Credentials credentials = requestContext.getBodyAs(Credentials.class);
-        return new Response(HttpStatus.OK, usersService.loginUser(credentials), Headers.CONTENT_TYPE_JSON);
+        return new Response(HttpStatus.OK, userService.loginUser(credentials), Headers.CONTENT_TYPE_JSON);
     }
 
     @Override

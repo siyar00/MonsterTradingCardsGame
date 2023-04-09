@@ -19,7 +19,7 @@ import java.sql.SQLException;
 
 public class UsersRepositoryImpl extends Repository implements UsersRepository {
 
-    public UsersRepositoryImpl(@NotNull DbConnector connector) {
+    public UsersRepositoryImpl(DbConnector connector) {
         super(connector);
     }
 
