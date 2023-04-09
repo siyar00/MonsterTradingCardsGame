@@ -14,7 +14,7 @@ public class Repository {
 
     protected final DbConnector connector;
 
-    public Repository(@NotNull DbConnector connector) {
+    public Repository(DbConnector connector) {
         this.connector = connector;
         try (PreparedStatement ps = connector.getConnection().prepareStatement(SETUP_TABLE)) {
             ps.execute();

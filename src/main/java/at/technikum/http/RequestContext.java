@@ -67,7 +67,6 @@ public class RequestContext {
         try {
             return objectMapper.readValue(body, clazz);
         } catch (JsonProcessingException e) {
-            System.err.println(e.getMessage());
             throw new BadRequestException(e.getMessage());
         }
     }
