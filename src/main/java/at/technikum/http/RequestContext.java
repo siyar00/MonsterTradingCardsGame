@@ -51,10 +51,7 @@ public class RequestContext {
             this.format = path.substring(path.lastIndexOf("format=") + "format=".length());
             path = path.substring(0, path.indexOf("?"));
         }
-        if (path.contains("users/")) {
-            this.pathVariable = path.substring(path.lastIndexOf("/") + 1);
-            this.path = path.substring(0, path.lastIndexOf("/") + 1);
-        } else if (path.contains("tradings/")) {
+        if (path.contains("users/") || path.contains("tradings/") || path.contains("buyCard/") || path.contains("deleteSale/")) {
             this.pathVariable = path.substring(path.lastIndexOf("/") + 1);
             this.path = path.substring(0, path.lastIndexOf("/") + 1);
         } else {

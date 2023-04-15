@@ -20,7 +20,7 @@ public class TradingController implements Controller {
 
     private final TradingService tradingService;
 
-    public TradingController(DataSource dataSource){
+    public TradingController(DataSource dataSource) {
         this.tradingService = new TradingService(new TradingRepositoryImpl(dataSource));
     }
 
@@ -37,12 +37,14 @@ public class TradingController implements Controller {
     }
 
     private Response deleteTradingDeal(RequestContext requestContext) {
+        new Authorization().noPathVariable(requestContext);
         String username = new Authorization().isAuthorized(requestContext);
         return new Response(HttpStatus.OK, tradingService.deletesExistingTradingDeal(username, requestContext.getPathVariable()));
     }
 
     private Response startTrading(RequestContext requestContext) {
         new Authorization().noBody(requestContext);
+        new Authorization().noPathVariable(requestContext);
         String username = new Authorization().isAuthorized(requestContext);
         String cardId = requestContext.getBodyAs(String.class);
         return new Response(HttpStatus.OK, tradingService.startTrading(username, requestContext.getPathVariable(), cardId));

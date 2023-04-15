@@ -214,7 +214,25 @@ public class AuthorizationTest {
         assertEquals("Content-Type is not JSON", exception.getMessage());
     }
 
+    @Test
+    public void noPathVariable(){
+        // given
+        RequestContext requestContext = new RequestContext();
+        requestContext.setPathVariable("");
+        // then
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            //when
+            authorization.noPathVariable(requestContext);
+        });
+        assertEquals("No parameter!", exception.getMessage());
+    }
 
-
-
+    @Test
+    public void noPathVariable_noException(){
+        // Arrange
+        RequestContext requestContext = new RequestContext();
+        requestContext.setPathVariable("test");
+        // Act/Assert
+        Assertions.assertDoesNotThrow(() -> authorization.noPathVariable(requestContext));
+    }
 }

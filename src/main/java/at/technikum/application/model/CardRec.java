@@ -8,7 +8,6 @@ public record CardRec(String username, String name, Double damage, String cardTy
         return this.cardType.equals("spell");
     }
 
-
     public String USER() {
         return this.username.toUpperCase();
     }

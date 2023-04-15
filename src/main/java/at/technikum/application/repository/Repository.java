@@ -1,9 +1,7 @@
 package at.technikum.application.repository;
 
 import at.technikum.application.config.DbConnector;
-import at.technikum.http.exceptions.BadRequestException;
 import at.technikum.http.exceptions.UnauthorizedException;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -132,10 +130,6 @@ public class Repository {
     protected static final String TRADING_SELF_TRADE = """
             SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?
             """;
-    protected static final String COIN_CHANGE = """
-            UPDATE users SET coins = coins - 1 WHERE user_id = ?;
-            UPDATE users SET coins = coins + 1 WHERE user_id = (SELECT c.user_id_fk FROM tradings t JOIN cards c ON t.card_to_trade = c.card_id WHERE t.trading_id = ?);
-            """;
     protected static final String DELETE_TRADING = """
             DELETE FROM tradings WHERE trading_id = ?;
             """;
@@ -159,6 +153,47 @@ public class Repository {
             UPDATE deck SET card1 = NULL, card2 = NULL, card3 = NULL, card4 = NULL WHERE user_id_fk = ?;
             """;
 
+    /**
+     * Market
+     */
+    protected static final String GET_COINS_MANA = """
+            SELECT coins, mana FROM users WHERE user_id = ?
+            """;
+    protected static final String UPDATE_COINS = """
+            UPDATE users SET coins = coins + (mana / 5) WHERE user_id = ? RETURNING coins
+            """;
+    protected static final String UPDATE_MANA = """
+            UPDATE users SET mana = mana % 5 WHERE user_id = ? RETURNING mana
+            """;
+    protected static final String CARD_OWNER = """
+            SELECT * FROM cards c JOIN deck d ON c.card_id != d.card1 AND c.card_id != d.card2 AND c.card_id != d.card3 AND c.card_id != d.card4
+            WHERE c.user_id_fk = ? AND c.card_id = ?
+            """;
+    protected static final String SELL_CARD = """
+            UPDATE cards SET for_sale = true, price = ? WHERE card_id = ?
+            """;
+    protected static final String ENOUGH_MONEY = """
+            SELECT price, coins FROM cards, users WHERE card_id = ? AND user_id = ?;
+            """;
+    protected static final String BUY_CARD = """
+            UPDATE users SET coins = coins - (SELECT price FROM cards WHERE card_id = ?) WHERE user_id = ?;
+            UPDATE users SET coins = coins + (SELECT price FROM cards WHERE card_id = ?) WHERE user_id = (SELECT user_id_fk FROM cards WHERE card_id = ?);
+            UPDATE cards SET user_id_fk = ?, for_sale = false, price = 0 WHERE card_id = ?;
+            """;
+    protected static final String DELETE_CARD_IN_MARKET = """
+            UPDATE cards SET for_sale = false, price = 0 WHERE card_id = ?
+            """;
+    protected static final String SHOW_MARKET = """
+            SELECT * FROM cards WHERE for_sale = true
+            """;
+    protected static final String NOT_IN_MARKET = """
+            SELECT * FROM cards WHERE for_sale = true AND card_id = ?
+            """;
+    protected static final String OWN_CARD = """
+            SELECT * FROM cards WHERE card_id = ? AND user_id_fk = ?
+            """;
+
+
     private static final String SETUP_TABLE = """
                 CREATE TABLE IF NOT EXISTS users (
                     user_id SERIAL PRIMARY KEY,
@@ -173,7 +208,7 @@ public class Repository {
                     losses INTEGER DEFAULT 0 NOT NULL,
                     draws INTEGER DEFAULT 0 NOT NULL,
                     played INTEGER DEFAULT 0 NOT NULL,
-                    mana INTEGER DEFAULT 0 NOT NULL
+                    mana INTEGER DEFAULT 0 NOT NULL CHECK (mana >= 0)
                 );
                 CREATE TABLE IF NOT EXISTS packages (
                 	package_id SERIAL PRIMARY KEY,
@@ -190,6 +225,8 @@ public class Repository {
                     damage NUMERIC NOT NULL CHECK (damage >= 0),
                     card_type TEXT,
                     element_type TEXT,
+                    for_sale BOOLEAN DEFAULT FALSE,
+                    price INTEGER DEFAULT 0 CHECK (price >= 0),
                     package_id_fk INTEGER DEFAULT NULL REFERENCES packages(package_id) ON DELETE CASCADE,
                     user_id_fk INTEGER DEFAULT NULL REFERENCES users(user_id) ON DELETE SET NULL
                 );
@@ -207,16 +244,5 @@ public class Repository {
                     minimum_damage NUMERIC
                 );
             """;
-
-
-    protected void coinChange(Connection connection, String tradingId, int boughtCard) {
-        try (PreparedStatement coinChange = connection.prepareStatement(COIN_CHANGE)) {
-            coinChange.setInt(1, boughtCard);
-            coinChange.setString(1, tradingId);
-            coinChange.execute();
-        } catch (SQLException e) {
-            throw new BadRequestException("Not enough coins to buy card.");
-        }
-    }
 
 }

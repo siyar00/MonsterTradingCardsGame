@@ -38,11 +38,16 @@ public record Authorization() {
     }
 
     public void noBody(@NotNull RequestContext requestContext) {
-        if (requestContext.getBody() == null || requestContext.getBody().equals("")) throw new BadRequestException("No Body!");
+        if (requestContext.getBody() == null || requestContext.getBody().equals(""))
+            throw new BadRequestException("No Body!");
         if (!requestContext.getHeaders().containsKey("Content-Type"))
             throw new BadRequestException("Content-Type is not declared");
         if (!requestContext.getHeaders().get("Content-Type").equals("application/json"))
             throw new BadRequestException("Content-Type is not JSON");
+    }
+
+    public void noPathVariable(@NotNull RequestContext requestContext) {
+        if (requestContext.getPathVariable().isEmpty()) throw new BadRequestException("No parameter!");
     }
 
 }

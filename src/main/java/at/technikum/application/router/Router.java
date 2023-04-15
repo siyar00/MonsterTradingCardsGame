@@ -1,11 +1,7 @@
 package at.technikum.application.router;
 
 import at.technikum.application.config.DataSource;
-import at.technikum.application.controller.CardController;
-import at.technikum.application.controller.GameController;
-import at.technikum.application.controller.PackageController;
-import at.technikum.application.controller.TradingController;
-import at.technikum.application.controller.UserController;
+import at.technikum.application.controller.*;
 import at.technikum.application.util.Pair;
 
 import java.util.HashMap;
@@ -22,6 +18,7 @@ public class Router {
         new GameController(ds).listRoutes().forEach(this::registerRoute);
         new PackageController(ds).listRoutes().forEach(this::registerRoute);
         new TradingController(ds).listRoutes().forEach(this::registerRoute);
+        new MarketController(ds).listRoutes().forEach(this::registerRoute);
     }
 
     public void registerRoute(Pair<RouteIdentifier, Route> routeIdentifierRoutePair) {

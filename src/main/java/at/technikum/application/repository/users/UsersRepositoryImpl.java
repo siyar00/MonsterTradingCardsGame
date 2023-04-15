@@ -10,7 +10,6 @@ import at.technikum.http.exceptions.NotFoundException;
 import at.technikum.http.exceptions.UnauthorizedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
