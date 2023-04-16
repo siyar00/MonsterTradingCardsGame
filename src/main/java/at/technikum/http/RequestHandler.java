@@ -28,7 +28,7 @@ public class RequestHandler implements Runnable {
             final RequestContext requestContext = new RequestContext().parseRequest(bufferedReader);
             //Can be deleted afterwards
             System.out.println("Thread: " + Thread.currentThread().getName());
-            //System.out.println(requestContext);
+            System.out.println(requestContext);
 
             final Route route = router.findRoute(new RouteIdentifier(requestContext.getPath(), requestContext.getHttpVerb()));
             Response response;

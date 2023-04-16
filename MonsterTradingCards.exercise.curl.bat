@@ -21,7 +21,7 @@ echo    a) should fail:
 curl -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
 echo.
 curl -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"different\"}"
-echo. 
+echo.
 echo.
 
 REM --------------------------------------------------
@@ -212,7 +212,11 @@ curl -X GET http://localhost:10001/scoreboard --header "Authorization: Basic kie
 echo.
 echo.
 echo    a) false endpoint (../score)
-curl -X GET http://localhost:10001/score --header "Authorization: Basic kienboec-mtcgToken"
+curl -X GET http://localhost:10001/score
+echo.
+echo.
+echo    19) scoreboard
+curl -X GET http://localhost:10001/scoreboard --header "Authorization: Basic kienboec-mtcgToken"
 echo.
 echo.
 
@@ -220,7 +224,7 @@ REM --------------------------------------------------
 echo    17) battle
 start /b "kienboec battle" curl -X POST http://localhost:10001/battles --header "Authorization: Basic kienboec-mtcgToken"
 start /b "altenhof battle" curl -X POST http://localhost:10001/battles --header "Authorization: Basic altenhof-mtcgToken"
-ping localhost -n 10 >NUL 2>NUL
+ping localhost -n 1 >NUL 2>NUL
 echo.
 echo.
 REM --------------------------------------------------
@@ -230,12 +234,6 @@ curl -X GET http://localhost:10001/stats --header "Authorization: Basic kienboec
 echo.
 echo altenhof
 curl -X GET http://localhost:10001/stats --header "Authorization: Basic altenhof-mtcgToken"
-echo.
-echo.
-
-REM --------------------------------------------------
-echo    19) scoreboard
-curl -X GET http://localhost:10001/scoreboard --header "Authorization: Basic kienboec-mtcgToken"
 echo.
 echo.
 
@@ -286,6 +284,119 @@ echo    d) show tradings (should be deleted)
 curl -X GET http://localhost:10001/tradings --header "Authorization: Basic kienboec-mtcgToken"
 echo.
 curl -X GET http://localhost:10001/tradings --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+
+REM --------------------------------------------------
+echo 22) market
+echo    should fail
+echo.
+echo    sell not owned card
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"Price\": 5}"
+echo.
+echo.
+echo    sell card with no body
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json"
+echo.
+echo.
+echo    sell card with no content-type
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken"  -d "{\"Id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"Price\": 5}"
+echo.
+echo.
+echo    sell card for more than 5 coins
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"Price\": 6}"
+echo.
+echo.
+echo    sell card for less than 1 coins
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"Price\": 0}"
+echo.
+echo.
+echo    sell card in deck
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"Price\": 2}"
+echo.
+echo.
+echo    22. show altenhof balance
+curl -X GET http://localhost:10001/balance  --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    22. show admin balance
+curl -X GET http://localhost:10001/balance  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    a) exchange mana to coins
+curl -X PUT http://localhost:10001/manaExchange  --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    b) should have 1 coin
+curl -X GET http://localhost:10001/balance  --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    c) sell a card
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic altenhof-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\", \"Price\": 5}"
+echo.
+echo.
+echo    d) showMarket
+curl -X GET http://localhost:10001/showMarket  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    admin buy a card (should fail because empty parameter)
+curl -X PUT http://localhost:10001/buyCard/ --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    kienboec buy a card (should fail because not enough money)
+curl -X PUT http://localhost:10001/buyCard/1cb6ab86-bdb2-47e5-b6e4-68c5ab389334 --header "Authorization: Basic kienboec-mtcgToken"
+echo.
+echo.
+echo    admin buy a card (should fail because not in the market)
+curl -X PUT http://localhost:10001/buyCard/aa9999a0-734c-49c6-8f4a-651864b14e62 --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    altenhof buy a card (should fail because card is owned by himself)
+curl -X PUT http://localhost:10001/buyCard/1cb6ab86-bdb2-47e5-b6e4-68c5ab389334 --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    e) admin buy a card
+curl -X PUT http://localhost:10001/buyCard/1cb6ab86-bdb2-47e5-b6e4-68c5ab389334 --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    f) showMarket (should be empty)
+curl -X GET http://localhost:10001/showMarket  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    g) show coin exchange. new balance altenhof
+curl -X GET http://localhost:10001/balance  --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    h) show coin exchange. new balance admin
+curl -X GET http://localhost:10001/balance  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    i) show the bought card from admin
+curl -X GET http://localhost:10001/cards  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    j) sell card admin
+curl -X POST http://localhost:10001/sellCard  --header "Authorization: Basic admin-mtcgToken" --header "Content-Type: application/json" -d "{\"Id\": \"1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\", \"Price\": 5}"
+echo.
+echo.
+echo    d) showMarket
+curl -X GET http://localhost:10001/showMarket  --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    delete sale by admin (should fail)
+curl -X DELETE http://localhost:10001/deleteSale/ --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    delete sale by altenhof (should fail)
+curl -X DELETE http://localhost:10001/deleteSale/1cb6ab86-bdb2-47e5-b6e4-68c5ab389334 --header "Authorization: Basic altenhof-mtcgToken"
+echo.
+echo.
+echo    e) delete sale
+curl -X DELETE http://localhost:10001/deleteSale/1cb6ab86-bdb2-47e5-b6e4-68c5ab389334 --header "Authorization: Basic admin-mtcgToken"
+echo.
+echo.
+echo    d) showMarket
+curl -X GET http://localhost:10001/showMarket  --header "Authorization: Basic admin-mtcgToken"
+echo.
 echo.
 
 REM --------------------------------------------------

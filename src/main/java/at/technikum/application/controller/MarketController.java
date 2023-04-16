@@ -41,24 +41,25 @@ public class MarketController implements Controller {
         String username = new Authorization().isAuthorized(requestContext);
         CardSell card = requestContext.getBodyAs(CardSell.class);
         if(card.getPrice() > 5) throw new BadRequestException("Cards can not be sold for more than 5 coins!");
+        if(card.getPrice() < 1) throw new BadRequestException("Cards can not be sold for less than 1 coins!");
         return new Response(HttpStatus.CREATED, marketService.sellCard(username, card));
     }
 
     private Response buyCard(RequestContext requestContext) {
         new Authorization().noPathVariable(requestContext);
         String username = new Authorization().isAuthorized(requestContext);
-        return new Response(HttpStatus.CREATED, marketService.buyCard(username, requestContext.getPathVariable()));
+        return new Response(HttpStatus.OK, marketService.buyCard(username, requestContext.getPathVariable()));
     }
 
     private Response deleteSale(RequestContext requestContext) {
         new Authorization().noPathVariable(requestContext);
         String username = new Authorization().isAuthorized(requestContext);
-        return new Response(HttpStatus.CREATED, marketService.deleteSale(username, requestContext.getPathVariable()));
+        return new Response(HttpStatus.OK, marketService.deleteSale(username, requestContext.getPathVariable()));
     }
 
     private Response showMarket(RequestContext requestContext) {
         String username = new Authorization().isAuthorized(requestContext);
-        return new Response(HttpStatus.CREATED, marketService.showMarket(username), Headers.CONTENT_TYPE_JSON);
+        return new Response(HttpStatus.OK, marketService.showMarket(username), Headers.CONTENT_TYPE_JSON);
     }
 
     @Override

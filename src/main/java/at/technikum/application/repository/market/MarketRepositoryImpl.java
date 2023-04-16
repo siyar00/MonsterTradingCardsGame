@@ -90,8 +90,8 @@ public class MarketRepositoryImpl extends Repository implements MarketRepository
 
     private void cardAuthorization(Integer userId, String cardId, Connection connection) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(CARD_OWNER);
-        stmt.setInt(1, userId);
-        stmt.setString(2, cardId);
+        stmt.setString(1, cardId);
+        stmt.setInt(2, userId);
         if (!stmt.executeQuery().next())
             throw new ForbiddenException("The card is not owned by the user or locked in the deck.");
     }
@@ -134,7 +134,7 @@ public class MarketRepositoryImpl extends Repository implements MarketRepository
         ResultSet rs = stmt.executeQuery();
         rs.next();
         if (rs.getInt("coins") < rs.getInt("price"))
-            throw new UnauthorizedException("User has not enough money to buy card!");
+            throw new ForbiddenException("User has not enough money to buy card!");
     }
 
     private void ownCard(int userId, String cardId, Connection connection) throws SQLException {
@@ -153,7 +153,7 @@ public class MarketRepositoryImpl extends Repository implements MarketRepository
             try (PreparedStatement updateStmt = connection.prepareStatement(DELETE_CARD_IN_MARKET)) {
                 updateStmt.setString(1, cardId);
                 updateStmt.executeUpdate();
-                return "Successfully deleted Sale";
+                return "Successfully deleted sale";
             } finally {
                 connection.close();
             }

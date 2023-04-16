@@ -166,8 +166,10 @@ public class Repository {
             UPDATE users SET mana = mana % 5 WHERE user_id = ? RETURNING mana
             """;
     protected static final String CARD_OWNER = """
-            SELECT * FROM cards c JOIN deck d ON c.card_id != d.card1 AND c.card_id != d.card2 AND c.card_id != d.card3 AND c.card_id != d.card4
-            WHERE c.user_id_fk = ? AND c.card_id = ?
+            SELECT card_id, user_id_fk, package_id_fk FROM cards
+            WHERE card_id NOT IN
+            (SELECT card_id FROM cards c JOIN deck d ON c.card_id = d.card1 OR c.card_id = d.card2 OR c.card_id = d.card3 OR c.card_id = d.card4)
+            AND card_id = ? AND user_id_fk = ?
             """;
     protected static final String SELL_CARD = """
             UPDATE cards SET for_sale = true, price = ? WHERE card_id = ?
