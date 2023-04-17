@@ -20,7 +20,7 @@ des Projektes, wenn auch alles richtig eingestellt wurde.
 ***
 Die Endpunkte sind in der ***swagger.yml*** Datei beschrieben. Für eine bessere Lesbarkeit kann man
 auf [Swagger](https://editor-next.swagger.io/)
-in der Kopfzeile auf File > Import File klicken und dann die swagger.yml Datei auswählen.
+in der Kopfzeile auf `File > Import File` klicken und dann die swagger.yml Datei auswählen und einfügen.
 
 ### DESIGN
 
