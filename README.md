@@ -11,7 +11,7 @@ kann.
 Man downloadet sich die neuste pgAdmin Software (zurzeit verwendet wird pgAdmin4 v6.19). Dabei wird als User ***
 postgres***
 und als Password ***admin*** verwendet. Das alles kann man jedoch in src/main/resources/hikari.properties ändern. Als
-nächstes wird eine Datenbank mit dem Namen ***mtcg*** erstellt. Als Schnittstelle wird der ***localhost*** mit Port ***
+Nächstes wird eine Datenbank mit dem Namen ***mtcg*** erstellt. Als Schnittstelle wird der ***localhost*** mit Port ***
 5432*** genommen, welche aber auch die Standardeinstellungen sind. Die Tabellen erstellen sich von alleine beim Starten
 des Projektes, wenn auch alles richtig eingestellt wurde.
 
@@ -45,8 +45,18 @@ man bei einem Kampf immer Mana erhalten kann. Mana kann man danach in Münzen ve
 ### LESSON-LEARNED
 
 ***
-Während des Projektes habe ich gelernt wie der Aufbau in einem Java-Projekt aussieht und es gleich auch in die Arbeit
-bei Erste Digital verwenden können, da ich zu der gleichen Zeit einen Task für das Erstellen eines Endpunktes hatte.
+Während des Projektes konnte ich umfassende Erfahrungen in Bezug auf den Aufbau eines Java-Projekts sammeln und diese
+direkt in meine Arbeit bei Erste Digital integrieren. Zu dieser Zeit hatte ich die Aufgabe, einen Endpunkt zu erstellen,
+bei der mir das erworbene Wissen sehr geholfen hat. Dabei konnte ich auch meine Kenntnisse in Bezug auf die Verwendung
+von Multithreading in Java erweitern und verstehen, wie Interfaces in Java eingesetzt werden können.
+
+Die Arbeit bei Erste Digital hat meine bereits vorhandenen Kenntnisse in Java weiter vertieft und mir die Möglichkeit
+gegeben, in einem professionellen Umfeld mit dieser Programmiersprache zu arbeiten. Durch die regelmäßige Anwendung von
+Java konnte ich meine Fähigkeiten in diesem Bereich kontinuierlich verbessern und neue Herausforderungen meistern.
+
+Insgesamt hat mich das Projekt und die Arbeit bei Erste Digital in meinem Verständnis und meiner Anwendung von Java
+weitergebracht und meine Fähigkeiten als Entwickler gestärkt. Es war eine wertvolle Erfahrung, die mich auf meinem
+beruflichen Weg vorangebracht hat.
 
 ### TEST
 
@@ -89,12 +99,22 @@ miteinander interagieren und das System als Ganzes wie erwartet funktioniert.
 ### TIME-SPENT
 
 ***
-Ich habe sehr spät mit dem Projekt angefangen, da beim ersten Antritt durch die anderen Fächer mir nicht soviel Zeit
-geblieben ist und beim zweiten Antritt die Betriebspraxisphase und eine Krankheit mir in den Weg gekommen sind. In das
-Thema hereinzukommen war etwas schwer, aber als ich es einmal drinnen war, lief alles wie am Schnürchen. Für das
-Hauptprogramm habe ich 5 ganze Tage gebraucht, für die Erweiterung des Markt-Endpunktes ging noch ein Tag drauf und für
-das Schreiben der Tests habe ich mir 2 Tage genommen. Insgesamt habe ich somit 8 volle Tage gebraucht, die ich auch voll
-ausgenützt habe, das heißt pro Tag 12 Stunden. Daraus folgt, es wurden 96 Stunden für das Projekt verwendet.
+Ich hatte zunächst Schwierigkeiten, mit dem Projekt zu beginnen, da ich aufgrund anderer Fächer und Verpflichtungen
+zunächst nur begrenzt Zeit hatte. Beim zweiten Antritt kam es dann durch eine Kombination aus Betriebspraxisphase und
+Krankheit zu weiteren Verzögerungen. Es war also kein optimaler Start in das Projekt, und ich musste hart arbeiten, um
+aufzuholen.
+
+Es hat einige Zeit gedauert, bis ich mich in das Thema eingearbeitet hatte und die erforderlichen Kenntnisse erworben
+hatte. Doch nachdem ich erstmal drin war, konnte ich schnell Fortschritte machen. Für das Hauptprogramm habe ich fünf
+volle Tage benötigt, um es vollständig zu implementieren. Für die Erweiterung des Markt-Endpunktes musste ich noch einen
+weiteren Tag aufwenden. Schließlich habe ich noch zwei Tage für das Schreiben der Tests gebraucht. Insgesamt habe ich
+also acht volle Tage damit verbracht, das Projekt zu bearbeiten. Diese Tage habe ich voll ausgenutzt, indem ich pro Tag
+zwölf Stunden gearbeitet habe.
+
+Letztendlich habe ich 96 Stunden in das Projekt investiert. Obwohl es nicht einfach war, das Projekt zu starten und es
+gab einige Hindernisse zu bewältigen, war es mir letztendlich möglich, das Projekt erfolgreich abzuschließen. Durch die
+intensive Arbeit konnte ich mein Verständnis und meine Fähigkeiten in Bezug auf das Thema erweitern und mich weiter als
+Entwickler verbessern.
 
 [GitHub-Link](https://github.com/siyar00/MonsterTradingCardsGame.git)
 
