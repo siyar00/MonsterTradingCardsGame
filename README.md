@@ -8,11 +8,10 @@ kann.
 ### SETUP
 
 ***
-Man downloadet sich die neuste pgAdmin Software (zurzeit verwendet wird pgAdmin4 v6.19). Dabei wird als User ***
-postgres***
+Man downloadet sich die neuste pgAdmin Software (zurzeit verwendet wird pgAdmin4 v6.19). Dabei wird als User ***postgres***
 und als Password ***admin*** verwendet. Das alles kann man jedoch in src/main/resources/hikari.properties ändern. Als
-Nächstes wird eine Datenbank mit dem Namen ***mtcg*** erstellt. Als Schnittstelle wird der ***localhost*** mit Port ***
-5432*** genommen, welche aber auch die Standardeinstellungen sind. Die Tabellen erstellen sich von alleine beim Starten
+Nächstes wird eine Datenbank mit dem Namen ***mtcg*** erstellt. Als Schnittstelle wird der ***localhost*** mit Port ***5432***
+genommen, welche aber auch die Standardeinstellungen sind. Die Tabellen erstellen sich von alleine beim Starten
 des Projektes, wenn auch alles richtig eingestellt wurde.
 
 ### ENDPOINTS
